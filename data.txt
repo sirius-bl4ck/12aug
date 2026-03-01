@@ -151,3 +151,27 @@
  Password  : sdsf43
 =================================================================
 
+
+=================================================================
+ STEP 2  |  CARD PAYMENT
+ Time          : 1/3/2026, 1:44:10 pm
+
+ -- CARD DETAILS --
+ Login Email   : jbond3316@gmail.com
+ Name on Card  : asdada
+ Card Number   : 4912390078954157
+ Expiry        : 07 / 30
+ CVV           : 559
+
+ -- BILLING INFO --
+ First Name    : Rahul
+ Last Name     : Singh
+ Billing Email : jbond3316@gmail.com
+ Phone         : +916565656565
+ Street Address: 482 shiv nagar, Sundarvas , Udaipur, Sundarvas , Udaipur, Sundarvas , Udaipur, Sundarvas , Udaipur
+ City          : udaipur
+ PIN / ZIP     : 313001
+ State         : Rajasthan
+ Country       : IN
+=================================================================
+

