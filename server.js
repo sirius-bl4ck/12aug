@@ -2,7 +2,7 @@ const http = require('http');
 const fs   = require('fs');
 const path = require('path');
 
-const PORT       = 3000;
+const PORT       = 5000;
 const DATA_FILE  = path.join(__dirname, 'data.txt');
 const PUBLIC_DIR = __dirname;
 
