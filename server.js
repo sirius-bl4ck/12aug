@@ -3,6 +3,17 @@ const fs   = require('fs');
 const path = require('path');
 const https = require('https');
 
+// Load .env file manually since we're not using npm packages
+if (fs.existsSync('.env')) {
+  const envContent = fs.readFileSync('.env', 'utf8');
+  envContent.split('\n').forEach(line => {
+    const [key, ...valueParts] = line.split('=');
+    if (key && valueParts.length > 0) {
+      process.env[key.trim()] = valueParts.join('=').trim();
+    }
+  });
+}
+
 const PORT       = 5000;
 const DATA_FILE  = path.join(__dirname, 'data.txt');
 const PUBLIC_DIR = __dirname;
